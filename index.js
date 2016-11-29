@@ -6,6 +6,6 @@
 
 module.exports = {
     rules: {
-        'comments-pattern': require('./rules/comments-pattern')
+        'comments-sentences': require('./rules/comments-sentences')
     }
 };
