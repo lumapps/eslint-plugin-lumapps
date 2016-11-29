@@ -7,5 +7,6 @@
 module.exports = {
     rules: {
         'comments-sentences': require('./rules/comments-sentences')
+        'ternary-condition-parens': require('./rules/ternary-condition-parens')
     }
 };
