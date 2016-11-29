@@ -15,7 +15,6 @@ const PUNCTUATION = /[!.?]$/;
 // Helpers
 //------------------------------------------------------------------------------
 
-const ALWAYS_MESSAGE = 'Comment should be a correct sentence';
 const DEFAULT_IGNORE_PATTERN = /^\s*(?:eslint|istanbul|jscs|jshint|globals?|exported|@.+)\b/;
 const WHITESPACE = /\s/g;
 const MAYBE_URL = /^\s*[^:/?#\s]+:\/\/[^?#]/;
@@ -30,8 +29,8 @@ const LOWERCASE_ERROR_MESSAGE = 'Starting by an uppercase letter while it should
 const PUNCTUATION_ERROR_MESSAGE = 'Line does not end by a punctuation';
 
 /*
- * Base schema body for defining the basic pattern, ignorePattern, and ignoreInlineComments values. This can be used in
- * a few different ways in the actual schema.
+ * Base schema body for defining the basic pattern, ignorePattern, and ignoreInlineComments values.
+ * This can be used in a few different ways in the actual schema.
  *
  * @type {Object}
  */
@@ -125,7 +124,7 @@ module.exports = function(context) {
      *
      * @param  {ASTNode} comment The comment node to process.
      * @param  {Object}  options The options for checking this comment.
-     * @return {boolean} True if the comment is valid, false otherwise.
+     * @return {boolean} True if the comment is valid, the error otherwise.
      */
     function isCommentValid(comment, options) {
         var col = 0;
