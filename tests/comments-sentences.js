@@ -43,6 +43,8 @@ ruleTester.run('comments-sentences', rule, {
         '/**\n * This is a valid comment.\n * That has multiple sentences.\n */',
         '/**\n * This is a valid comment,\n * with one long sentence.\n */',
         '/*\n * This is a valid comment,\n * with one long sentence.\n */',
+        '////////',
+        '/*******/',
     ],
 
     invalid: [{

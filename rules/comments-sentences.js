@@ -170,6 +170,7 @@ module.exports = function(context) {
 
             // Remove any asterisk from the comment line.
             line = lines[i].replace(/\s*\*/g, '');
+            line = line.replace(/\//g, '');
 
             isIgnored = true;
 
