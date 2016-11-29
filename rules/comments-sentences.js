@@ -199,8 +199,8 @@ module.exports = function(context) {
             isIgnored = false;
 
             // 2.5. Check that the comment start with a single space.
-            if (line[0] !== ' ') {
-                return 'Not starting by a single space';
+            if (!/^\s+/.test(line)) {
+                return 'Not starting by spaces';
             }
 
             // Remove the useless first space.

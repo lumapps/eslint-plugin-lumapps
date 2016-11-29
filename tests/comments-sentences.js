@@ -16,7 +16,7 @@ const RuleTester = require("eslint").RuleTester;
 // Helpers
 //------------------------------------------------------------------------------
 
-const SPACE_ERROR_MESSAGE = 'Not starting by a single space';
+const SPACE_ERROR_MESSAGE = 'Not starting by spaces';
 const UPPERCASE_ERROR_MESSAGE = 'Not starting by an uppercase letter while it should';
 const LOWERCASE_ERROR_MESSAGE = 'Starting by an uppercase letter while it should not';
 const PUNCTUATION_ERROR_MESSAGE = 'Line does not end by a punctuation';
