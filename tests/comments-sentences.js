@@ -45,6 +45,7 @@ ruleTester.run('comments-sentences', rule, {
         '/*\n * This is a valid comment,\n * with one long sentence.\n */',
         '////////',
         '/*******/',
+        '// This is a valid comment //',
     ],
 
     invalid: [{
