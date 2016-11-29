@@ -135,5 +135,10 @@ ruleTester.run('comments-sentences', rule, {
         errors: [{
             message: SPACE_ERROR_MESSAGE,
         }],
-    }, ],
+    }, {
+        code: '/**\n * Return the placeholder for a translatable object.\n * If the translatable content has no translation, display a fixed placeholder.\n * Else display the value of the translatable content in the "checkLanguage".\n * Else, display the first available translation\n *\n * @param  {string|Object} content            The translatable content.\n * @param  {string|Object} defaultPlaceholder The placeholder to use if the translatable content has no\n *                                            translations.\n * @param  {string}        [lang=current]     The lang to use.\n * @return {string}        The placeholder.\n */',
+        errors: [{
+            message: PUNCTUATION_ERROR_MESSAGE,
+        }],
+    }],
 });

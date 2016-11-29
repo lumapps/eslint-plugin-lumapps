@@ -159,14 +159,18 @@ module.exports = function(context) {
         var previousLine;
         var isIgnored = true;
         var wasIgnored = true;
+        var isEmpty = true;
+        var wasEmpty = true;
         var isEndingByPunctuation = true;
         var wasEndingByPunctuation = true;
         for (var i = 0, len = lines.length; i < len; i++) {
             wasIgnored = isIgnored;
             if (!wasIgnored) {
+                wasEmpty = isEmpty;
                 wasEndingByPunctuation = isEndingByPunctuation;
                 previousLine = line;
             }
+            isEmpty = false;
 
             // Remove any asterisk from the comment line.
             line = lines[i].replace(/\s*\*/g, '');
@@ -188,14 +192,21 @@ module.exports = function(context) {
                 continue;
             }
 
+            isIgnored = false;
+
             // Remove all whitespaces from the comment.
             const commentWordCharsOnly = line.replace(WHITESPACE, "");
             // 2.4. Is the comment line empty (or only whitespaces)
             if (commentWordCharsOnly.length === 0) {
+                isEmpty = true;
+
+                if (!wasEndingByPunctuation) {
+                    return 'Line does not end by a punctuation';
+                }
+
                 continue;
             }
 
-            isIgnored = false;
 
             // 2.5. Check that the comment start with a single space or multiple (at least 2) "/".
             if (!/^(\s+|\/{2,})/.test(line)) {
@@ -209,12 +220,12 @@ module.exports = function(context) {
             if (FIRST_LETTER_PATTERN.test(firstWordChar)) {
                 // 2.6. Check that if the previous line ended with a punctuation or was ignored, the first letter is
                 // uppercase.
-                if ((wasEndingByPunctuation || wasIgnored) && firstWordChar !== firstWordChar.toLocaleUpperCase()) {
+                if ((wasEndingByPunctuation || wasIgnored || wasEmpty) && firstWordChar !== firstWordChar.toLocaleUpperCase()) {
                     return 'Not starting by an uppercase letter while it should';
                 }
                 // 2.6. Check that if the previous line was not ending with a punctuation or was not ignored, the first
                 // letter is lowercase.
-                if (!wasEndingByPunctuation && !wasIgnored && firstWordChar !== firstWordChar.toLocaleLowerCase()) {
+                if (!wasEndingByPunctuation && !wasIgnored && !wasEmpty && firstWordChar !== firstWordChar.toLocaleLowerCase()) {
                     return 'Starting by an uppercase letter while it should not';
                 }
             }
