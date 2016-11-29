@@ -1,0 +1,30 @@
+{
+  "name": "eslint-plugin-lumapps-rules",
+  "version": "1.0.0",
+  "description": "Lumapps customized ESLint rules",
+  "keywords": [
+    "eslint",
+    "eslintplugin",
+    "eslintrules",
+    "eslint-plugin",
+    "eslint-rules",
+    "Lumapps"
+  ],
+  "author": "Clément P. <clement@lumapps.com> (https://github.com/clementprevot)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lumapps/lumapps-eslint-rules.git"
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha ./tests/*.js"
+  },
+  "peerDependencies": {
+    "eslint": ">=1.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^1.2.0",
+    "mocha": "^2.4.5"
+  },
+  "license": "MIT"
+}
