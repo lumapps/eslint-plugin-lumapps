@@ -1,1 +1,1 @@
-# lumapps-eslint-rules
+# eslint-plugin-lumapps
