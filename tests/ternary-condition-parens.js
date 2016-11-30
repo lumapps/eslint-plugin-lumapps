@@ -9,7 +9,7 @@
 //------------------------------------------------------------------------------
 
 const rule = require('../rules/ternary-condition-parens');
-const RuleTester = require("eslint").RuleTester;
+const RuleTester = require('eslint').RuleTester;
 
 
 //------------------------------------------------------------------------------
@@ -25,6 +25,25 @@ const NEVER_MESSAGE = 'Unexpected parentheses around condition of ternary expres
 
 const ruleTester = new RuleTester();
 ruleTester.run('ternary-condition-parens', rule, {
+    invalid: [{
+        code: 'true ? true : false',
+        errors: [{
+            message: ALWAYS_MESSAGE,
+        }],
+    }, {
+        code: 'true ? true : false',
+        errors: [{
+            message: ALWAYS_MESSAGE,
+        }],
+        options: ['always'],
+    }, {
+        code: '(true) ? true : false',
+        errors: [{
+            message: NEVER_MESSAGE,
+        }],
+        options: ['never'],
+    }],
+
     valid: [
         '(true) ? true : false', {
             code: '(true) ? true : false',
@@ -34,23 +53,4 @@ ruleTester.run('ternary-condition-parens', rule, {
             options: ['never'],
         },
     ],
-
-    invalid: [{
-        code: 'true ? true : false',
-        errors: [{
-            message: ALWAYS_MESSAGE,
-        }, ],
-    }, {
-        code: 'true ? true : false',
-        options: ['always'],
-        errors: [{
-            message: ALWAYS_MESSAGE,
-        }, ],
-    }, {
-        code: '(true) ? true : false',
-        options: ['never'],
-        errors: [{
-            message: NEVER_MESSAGE,
-        }, ],
-    }, ],
 });

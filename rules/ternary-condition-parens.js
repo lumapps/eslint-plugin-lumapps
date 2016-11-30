@@ -19,9 +19,9 @@
  * @type {Object}
  */
 const SCHEMA_BODY = {
-    type: 'object',
-    properties: {},
     additionalProperties: false,
+    properties: {},
+    type: 'object',
 };
 
 //------------------------------------------------------------------------------
@@ -41,30 +41,16 @@ const SCHEMA_BODY = {
 // },
 
 // create
-module.exports = function(context) {
+module.exports = function exportsFunction(context) {
     const sourceCode = context.getSourceCode();
 
-    const parentheses = context.options[0] !== "never";
+    const parentheses = context.options[0] !== 'never';
 
     //----------------------------------------------------------------------
     // Helpers
     //----------------------------------------------------------------------
 
-    /**
-     * Determines if a node is surrounded by parentheses.
-     *
-     * @param  {SourceCode} sourceCode The ESLint source code object
-     * @param  {ASTNode}    node       The node to be checked.
-     * @return {boolean}    True if the node is parenthesised.
-     */
-    function isParenthesised(sourceCode, node) {
-        const previousToken = sourceCode.getTokenBefore(node),
-            nextToken = sourceCode.getTokenAfter(node);
-
-        return Boolean(previousToken && nextToken) &&
-            previousToken.value === "(" && previousToken.range[1] <= node.range[0] &&
-            nextToken.value === ")" && nextToken.range[0] >= node.range[1];
-    }
+    const astUtils = require('eslint/lib/ast-utils');
 
     /**
      * Report an error with a ternary.
@@ -75,11 +61,11 @@ module.exports = function(context) {
      */
     function reportError(node, parentNode, expected) {
         context.report({
-            node,
-            message: "{{expected}} parentheses around condition of ternary expression.",
             data: {
-                expected: (expected) ? "Expected" : "Unexpected",
-            }
+                expected: (expected) ? 'Expected' : 'Unexpected',
+            },
+            message: '{{expected}} parentheses around condition of ternary expression.',
+            node: node,
         });
     }
 
@@ -88,18 +74,16 @@ module.exports = function(context) {
     //----------------------------------------------------------------------
 
     return {
-        ConditionalExpression(node) {
-            const isConditionSurroundedByParentheses = isParenthesised(sourceCode, node.test);
+        ConditionalExpression: function ConditionalExpression(node) {
+            const isConditionSurroundedByParentheses = astUtils.isParenthesised(sourceCode, node.test);
 
-            if (!parentheses) {
-                if (isConditionSurroundedByParentheses) {
-                    reportError(node.test, node, false);
-                }
-            } else {
+            if (parentheses) {
                 if (!isConditionSurroundedByParentheses) {
                     reportError(node.test, node, true);
                 }
+            } else if (isConditionSurroundedByParentheses) {
+                reportError(node.test, node, false);
             }
-        }
+        },
     };
 };
