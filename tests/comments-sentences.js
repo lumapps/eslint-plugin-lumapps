@@ -144,7 +144,9 @@ ruleTester.run('comments-sentences', rule, {
 
     valid: [
         // eslint-disable-next-line max-len
-        'function toto() {\n    var a = 1;\n    // a is a variable.\n    // d is a variable too.\n    if (a === 1) { var c = 3 }\n    var f = function f() { var d = 4; }\n    var b = 2;\n}',
+        'function toto() {\n    var a = 1;\n    // a is a variable.\n    if (a === 1) { var c = 3 }\n    var f = function f() {\n        // d is a variable too.\n        var d = 4;\n        }\n    var b = 2;\n}',
+        // eslint-disable-next-line max-len
+        'function toto() {\n    var a = 1;\n    // d is a variable.\n    if (a === 1) { var c = 3 }\n    var f = function f() {\n        // a is still a variable.\n        var d = 4;\n        }\n    var b = 2;\n}',
         'var a = 1;\n// b is a variable.\nvar b = 2;',
         '// This is a valid comment.',
         '// 29 is a valid comment.',
