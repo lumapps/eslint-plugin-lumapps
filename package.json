@@ -20,10 +20,10 @@
     "test": "mocha ./tests/*.js"
   },
   "peerDependencies": {
-    "eslint": ">=1.0.0"
+    "eslint": "latest"
   },
   "devDependencies": {
-    "eslint": "^1.2.0",
+    "eslint": "latest",
     "mocha": "^2.4.5"
   },
   "license": "MIT",
