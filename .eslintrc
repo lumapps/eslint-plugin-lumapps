@@ -170,7 +170,7 @@
             "never"
         ],
         "func-name-matching": [
-            "error",
+            "off",
             "always",
             {
                 "includeCommonJSModuleExports": true
@@ -558,7 +558,7 @@
                 }
             }
         ],
-        "strict": "error",
+        "strict": "off",
         "symbol-description": "error",
         "template-curly-spacing": [
             "error",
