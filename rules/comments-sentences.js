@@ -122,11 +122,12 @@ module.exports = function(context) {
     /**
      * Check a comment to determine if it is valid for this rule.
      *
-     * @param  {ASTNode} comment The comment node to process.
-     * @param  {Object}  options The options for checking this comment.
+     * @param  {ASTNode} comment   The comment node to process.
+     * @param  {Object}  options   The options for checking this comment.
+     * @param  {Object}  variables The list of variables in the scope.
      * @return {boolean} True if the comment is valid, the error otherwise.
      */
-    function isCommentValid(comment, options) {
+    function isCommentValid(comment, options, variables) {
         var col = 0;
         var lineNumber;
         var message;
@@ -207,9 +208,11 @@ module.exports = function(context) {
 
             // Remove the useless first space.
             line = line.substring(1);
+
             // 2.6. Is the initial word character a letter?
+            const firstWord = (line.split(' ') || [''])[0];
             const firstWordChar = line[0];
-            if (FIRST_LETTER_PATTERN.test(firstWordChar)) {
+            if (FIRST_LETTER_PATTERN.test(firstWordChar) && !variables[firstWord]) {
                 // 2.6.1. Check that if the previous line ended with a punctuation or was ignored, the first letter is
                 // uppercase.
                 if ((wasEndingByPunctuation || wasIgnored || wasEmpty) &&
@@ -265,10 +268,11 @@ module.exports = function(context) {
     /**
      * Process a comment to determine if it needs to be reported.
      *
-     * @param {ASTNode} comment The comment node to process.
+     * @param {ASTNode} comment   The comment node to process.
+     * @param {Object}  variables The list of variables in the scope.
      */
-    function processComment(comment) {
-        const commentValid = isCommentValid(comment, normalizedOptions);
+    function processComment(comment, variables) {
+        const commentValid = isCommentValid(comment, normalizedOptions, variables);
 
         if (commentValid !== true) {
             context.report({
@@ -289,8 +293,16 @@ module.exports = function(context) {
     return {
         Program() {
             const comments = sourceCode.getAllComments();
+            const scope = context.getScope();
 
-            comments.forEach(processComment);
+            const variables = {};
+            (scope.variables || []).forEach(function forEachVariables(variable) {
+                variables[variable.name] = true;
+            });
+
+            comments.forEach(function forEachComments(comment) {
+                processComment(comment, variables)
+            });
         }
     };
 };

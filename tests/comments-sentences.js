@@ -28,6 +28,9 @@ const PUNCTUATION_ERROR_MESSAGE = 'Line does not end by a punctuation';
 const ruleTester = new RuleTester();
 ruleTester.run('comments-sentences', rule, {
     valid: [
+        'var a = 1;\n// This is a test.\nvar b = 2;',
+        'var a = 1;\n// a is a variable.\nvar b = 2;',
+        'var a = 1;\n// b is a variable.\nvar b = 2;',
         '// This is a valid comment.',
         '// 29 is a valid comment.',
         '// @description This is a valid comment.',
@@ -153,5 +156,15 @@ ruleTester.run('comments-sentences', rule, {
         errors: [{
             message: PUNCTUATION_ERROR_MESSAGE,
         }, ]
-    }],
+    }, {
+        code: 'var a = 1;\n// a is a variable\nvar b = 2;',
+        errors: [{
+            message: PUNCTUATION_ERROR_MESSAGE,
+        }, ],
+    }, {
+        code: 'var a = 1;\n// c is not a variable.\nvar b = 2;',
+        errors: [{
+            message: UPPERCASE_ERROR_MESSAGE,
+        }, ],
+    }, ],
 });
