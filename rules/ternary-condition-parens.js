@@ -18,11 +18,11 @@
  *
  * @type {Object}
  */
-const SCHEMA_BODY = {
-    additionalProperties: false,
-    properties: {},
-    type: 'object',
-};
+// const SCHEMA_BODY = {
+//     additionalProperties: false,
+//     properties: {},
+//     type: 'object',
+// };
 
 //------------------------------------------------------------------------------
 // Rule Definition

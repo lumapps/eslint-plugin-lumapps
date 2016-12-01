@@ -1,5 +1,5 @@
 /**
- * @fileoverview enforce a given pattern for comments
+ * @fileoverview enforce parentheses around ternary's conditions
  * @author Clément P.
  */
 'use strict';
