@@ -1,5 +1,5 @@
 /**
- * @fileoverview enforce a given pattern for comments
+ * @fileoverview enforce that comments are correct sentences
  * @author Clément P.
  */
 'use strict';

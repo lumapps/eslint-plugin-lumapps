@@ -1,5 +1,5 @@
 /**
- * @fileoverview enforce a given pattern for comments
+ * @fileoverview enforce that comments are correct sentences
  * @author Clément P.
  */
 'use strict';
@@ -10,7 +10,6 @@
 
 const FIRST_LETTER_PATTERN = require('eslint/lib/util/patterns/letters');
 const PUNCTUATION = /[!.?]$/;
-const astUtils = require('eslint/lib/ast-utils');
 
 //------------------------------------------------------------------------------
 // Helpers
@@ -35,18 +34,18 @@ const PUNCTUATION_ERROR_MESSAGE = 'Line does not end by a punctuation';
  *
  * @type {Object}
  */
-const SCHEMA_BODY = {
-    additionalProperties: false,
-    properties: {
-        ignoreInlineComments: {
-            type: 'boolean',
-        },
-        ignorePattern: {
-            type: 'string',
-        },
-    },
-    type: 'object',
-};
+// const SCHEMA_BODY = {
+//     additionalProperties: false,
+//     properties: {
+//         ignoreInlineComments: {
+//             type: 'boolean',
+//         },
+//         ignorePattern: {
+//             type: 'string',
+//         },
+//     },
+//     type: 'object',
+// };
 
 /**
  * Get all the variables of the global scope and all child scopes of the current context.
