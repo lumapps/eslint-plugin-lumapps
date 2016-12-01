@@ -282,7 +282,7 @@ module.exports = function exportsFunction(context) {
 
         return (message !== undefined && message.length > 0) ? {
             data: {
-                col: col + 1,
+                col: col,
                 commentLine: lines[lineNumber],
                 line: lineNumber + 1,
                 more: more,
