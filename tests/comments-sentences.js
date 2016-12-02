@@ -128,7 +128,7 @@ ruleTester.run('comments-sentences', rule, {
         }],
         options: [{
             // eslint-disable-next-line no-useless-escape
-            ignorePattern: ';\s*$',
+            ignorePattern: ';\\s*$',
         }],
     }, {
         code: 'var a = 1;\n// a is a variable\nvar b = 2;',
@@ -170,7 +170,7 @@ ruleTester.run('comments-sentences', rule, {
             code: '/**\n * Translation Service.\n * Allow to translate a string using pascalprecht angular translate module or using an array of string.\n *\n * You must have angular-translate (pascalprecht.translate) module available to use this service.\n * Remember to declare your language in angular-translate:\n *      $translateProvider.translations("<langCode: en/fr/es, ...>",\n *      {\n *          // Your translations here.\n *      };\n *\n * Remember also to set a default, preferred and fallback language:\n *      // Set the preferred language the same that the browser language.\n *      ($translateProvider.preferredLanguage((navigator.language != null)) ?\n *          navigator.language :\n *          navigator.browserLanguage).split("_")[0].split("-")[0]);\n *\n *      // Default language to display of any other is not available.\n *      $translateProvider.fallbackLanguage("en");\n *\n *\n * You can then use this service to translate:\n *     - an array containing languages: content["en"] = "Test English"; content["fr"] = "Test Français";\n *     - an angular-translate token ("SITE_TITLE");\n */',
             options: [{
                 // eslint-disable-next-line no-useless-escape
-                ignorePattern: ';\s*$',
+                ignorePattern: ';\\s*$',
             }],
         },
     ],
