@@ -79,11 +79,11 @@ ruleTester.run('file-format', rule, {
         }],
     }, {
         // eslint-disable-next-line max-len
-        code: "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n        var _toto = 6;\n\n    /////////////////////////\n    //  Private functions  //\n    /////////////////////////\n})();\n",
+        code: "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n    /////////////////////////\n    //  Private functions  //\n    /////////////////////////\n\n        var _toto = 6;\n})();\n",
         errors: [{
-            message: MISSING_STUB_SEPARATOR_MESSAGE.PRIVATE_ATTRIBUTES,
-        }, {
             message: SEPARATOR_FORMAT_MESSAGE,
+        }, {
+            message: MISSING_STUB_SEPARATOR_MESSAGE.PRIVATE_ATTRIBUTES,
         }],
     }, {
         // eslint-disable-next-line max-len
@@ -105,37 +105,37 @@ ruleTester.run('file-format', rule, {
         }],
     }, {
         // eslint-disable-next-line max-len
-        code: "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n    function toto($scope) {\n        $scope.$on('toto', function() { console.log('toto'); })\n    }\n})();\n",
+        code: "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n    function toto($scope) {\n        $scope.$on('toto', function() { console.log('toto'); });\n    }\n})();\n",
         errors: [{
             message: MISSING_STUB_SEPARATOR_MESSAGE.EVENTS,
         }],
     }, {
         // eslint-disable-next-line max-len
-        code: "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n    function toto($scope) {\n        $rootScope.$on('toto', function() { console.log('toto'); })\n    }\n})();\n",
+        code: "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n    function toto($rootScope) {\n        $rootScope.$on('toto', function() { console.log('toto'); });\n    }\n})();\n",
         errors: [{
             message: MISSING_STUB_SEPARATOR_MESSAGE.EVENTS,
         }],
     }, {
         // eslint-disable-next-line max-len
-        code: "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n    function toto($scope) {\n        $scope.$watchCollection('toto', function() { console.log('toto'); })\n    }\n})();\n",
+        code: "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n    function toto($scope) {\n        $scope.$watchCollection('toto', function() { console.log('toto'); });\n    }\n})();\n",
         errors: [{
             message: MISSING_STUB_SEPARATOR_MESSAGE.WATCHERS,
         }],
     }, {
         // eslint-disable-next-line max-len
-        code: "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n    function toto($scope) {\n        $rootScope.$watchCollection('toto', function() { console.log('toto'); })\n    }\n})();\n",
+        code: "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n    function toto($rootScope) {\n        $rootScope.$watchCollection('toto', function() { console.log('toto'); });\n    }\n})();\n",
         errors: [{
             message: MISSING_STUB_SEPARATOR_MESSAGE.WATCHERS,
         }],
     }, {
         // eslint-disable-next-line max-len
-        code: "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n    function toto($scope) {\n        $scope.$watch('toto', function() { console.log('toto'); })\n    }\n})();\n",
+        code: "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n    function toto($scope) {\n        $scope.$watch('toto', function() { console.log('toto'); });\n    }\n})();\n",
         errors: [{
             message: MISSING_STUB_SEPARATOR_MESSAGE.WATCHERS,
         }],
     }, {
         // eslint-disable-next-line max-len
-        code: "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n    function toto($scope) {\n        $rootScope.$watch('toto', function() { console.log('toto'); })\n    }\n})();\n",
+        code: "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n    function toto($rootScope) {\n        $rootScope.$watch('toto', function() { console.log('toto'); });\n    }\n})();\n",
         errors: [{
             message: MISSING_STUB_SEPARATOR_MESSAGE.WATCHERS,
         }],
@@ -146,5 +146,9 @@ ruleTester.run('file-format', rule, {
         "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n    /////////////////////////////\n    //                         //\n    //    Private attributes   //\n    //                         //\n    /////////////////////////////\n\n        var _toto = 101;\n    console.log(_toto);\n})();\n",
         // eslint-disable-next-line max-len
         "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n    /////////////////////////////\n\n    /////////////////////////////\n    //                         //\n    //    Private attributes   //\n    //                         //\n    /////////////////////////////\n\n        var _toto = 102;\n\n    /////////////////////////////\n    //                         //\n    //    Private functions    //\n    //                         //\n    /////////////////////////////\n})();\n",
+        // eslint-disable-next-line max-len
+        "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n    function toto($scope) {\n        /////////////////////////////\n        //                         //\n        //        Watchers         //\n        //                         //\n        /////////////////////////////\n\n        $scope.$watch('toto', function() { console.log('toto'); });\n    }\n})();\n",
+        // eslint-disable-next-line max-len
+        "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n    function toto($scope) {\n        /////////////////////////////\n        //                         //\n        //          Events         //\n        //                         //\n        /////////////////////////////\n\n        $scope.$on('toto', function() { console.log('toto'); });\n    }\n})();\n",
     ],
 });

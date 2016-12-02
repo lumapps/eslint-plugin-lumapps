@@ -227,45 +227,6 @@ module.exports = function exportsFunction(context) {
             });
         }
 
-        error = false;
-        Object.keys(SEPARATORS_REGEXP).forEach(function forEachSeparators(separatorName) {
-            let exactSeparatorRegexp = SEPARATORS[separatorName];
-            let separatorRegexp = SEPARATORS_REGEXP[separatorName];
-
-            for (let k = 0; k < len; k++) {
-                line = lines[k];
-
-                if (separatorRegexp.test(line) && k > 1 && k < len - 1) {
-                    if (!exactSeparatorRegexp.test(line) || lines[k - 3].length > 0 ||
-                        !SEPARATOR_REGEXP.test(lines[k - 2]) || !EMPTY_SEPARATOR_REGEXP.test(lines[k - 1]) ||
-                        !SEPARATOR_REGEXP.test(lines[k + 2]) || !EMPTY_SEPARATOR_REGEXP.test(lines[k + 1])) {
-                        error = true;
-
-                        let expectedSeparator =
-                            `${SEPARATOR}\n${EMPTY_SEPARATOR}\n${line.trim()}\n${EMPTY_SEPARATOR}${SEPARATOR}\n`;
-                        context.report({
-                            data: `Expected "${expectedSeparator}" before and after`,
-                            loc: {
-                                end: {
-                                    line: k + 1,
-                                },
-                                start: {
-                                    line: k + 1,
-                                },
-                            },
-                            message: SEPARATOR_FORMAT_MESSAGE,
-
-                            node: null,
-                        });
-                    }
-
-                    if (!error) {
-                        k += 3;
-                    }
-                }
-            }
-        });
-
         let seen = {
             EVENTS: false,
             PRIVATE_ATTRIBUTES: false,
@@ -290,25 +251,58 @@ module.exports = function exportsFunction(context) {
             PUBLIC_FUNCTIONS: /^\s{8}function [a-z][^(]*\([^)]*\) {/,
             WATCHERS: /^\s{8}\$(rootScope|scope)\.\$watch(Collection)?\(/,
         };
-        for (let l = 0; l < len; l++) {
-            line = lines[l];
+
+        for (let k = 0; k < len; k++) {
+            error = false;
+            line = lines[k];
 
             // eslint-disable-next-line no-loop-func
             Object.keys(regexp).forEach(function forEachRegexp(regexpName) {
-                if (first[regexpName]) {
-                    if (!seen[regexpName] && SEPARATORS[regexpName].test(line)) {
+                if (!seen[regexpName] && SEPARATORS_REGEXP[regexpName].test(line)) {
+                    if (!SEPARATORS[regexpName].test(line) ||
+                        !SEPARATOR_REGEXP.test(lines[k - 2]) || !EMPTY_SEPARATOR_REGEXP.test(lines[k - 1]) ||
+                        !SEPARATOR_REGEXP.test(lines[k + 2]) || !EMPTY_SEPARATOR_REGEXP.test(lines[k + 1])) {
+                        error = true;
+
+                        let expectedSeparator =
+                            `${SEPARATOR}\n${EMPTY_SEPARATOR}\n${line.trim()}\n${EMPTY_SEPARATOR}${SEPARATOR}\n`;
+                        context.report({
+                            data: `Expected "${expectedSeparator}" before and after`,
+                            loc: {
+                                end: {
+                                    line: k + 1,
+                                },
+                                start: {
+                                    line: k + 1,
+                                },
+                            },
+                            message: SEPARATOR_FORMAT_MESSAGE,
+
+                            node: null,
+                        });
+                    }
+
+                    if (!error) {
                         seen[regexpName] = true;
-                    } else if (regexp[regexpName].test(line)) {
+
+                        k += 3;
+                    }
+
+                    return;
+                }
+
+                if (first[regexpName]) {
+                    if (regexp[regexpName].test(line)) {
                         first[regexpName] = false;
 
                         if (!seen[regexpName]) {
                             context.report({
                                 loc: {
                                     end: {
-                                        line: l + 1,
+                                        line: k + 1,
                                     },
                                     start: {
-                                        line: l + 1,
+                                        line: k + 1,
                                     },
                                 },
                                 message: MISSING_STUB_SEPARATOR_MESSAGE[regexpName],
@@ -326,10 +320,10 @@ module.exports = function exportsFunction(context) {
                     data: `Expected private variable to be prefixed by "_"`,
                     loc: {
                         end: {
-                            line: l + 1,
+                            line: k + 1,
                         },
                         start: {
-                            line: l + 1,
+                            line: k + 1,
                         },
                     },
                     message: PRIVATE_VARIABLE_PREFIXED,
