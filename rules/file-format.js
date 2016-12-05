@@ -314,8 +314,8 @@ module.exports = function exportsFunction(context) {
                 }
             });
 
-            if ((/^\s{4,8}(var|let) [a-z][^ ]* = /).test(line) &&
-                !(/^\s{4,8}(var|let) [a-z][^ ]* = this;$/).test(line)) {
+            if ((/^\s{8}(var|let) [a-z][^ ]* = /).test(line) &&
+                !(/^\s{8}(var|let) [a-z][^ ]* = this;$/).test(line)) {
                 context.report({
                     data: `Expected private variable to be prefixed by "_"`,
                     loc: {
