@@ -94,9 +94,6 @@ module.exports = {
          */
         function reportError(node, expected) {
             context.report({
-                fix: function fix(fixer) {
-                    // console.log(node);
-                },
                 message: (expected) ? 'You should prefer the "angular.forEach" loop instead.' :
                     'You should prefer a standard "for" loop instead.',
                 node: node,
@@ -141,7 +138,7 @@ module.exports = {
                           control (return, break or continue)',
             recommended: false,
         },
-        fixable: 'code',
+        fixable: null,
         schema: [
             {
                 'enum': [
