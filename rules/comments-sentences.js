@@ -138,10 +138,10 @@ module.exports = {
          * @return {boolean} True if the comment is valid, the error otherwise.
          */
         function isCommentValid(comment, options, variables) {
-            var col = 0;
-            var lineNumber;
-            var message;
-            var more;
+            let col = 0;
+            let lineNumber;
+            let message;
+            let more;
 
             // 1. Check for inline comments.
             if (options.ignoreInlineComments === true && isInlineComment(comment)) {
@@ -149,18 +149,18 @@ module.exports = {
             }
 
             // 2. Check that the comment is globally a correct sentence.
-            var lines = comment.value.split('\n') || [comment.value];
+            let lines = comment.value.split('\n') || [comment.value];
 
-            var line;
-            var isIgnored = true;
-            var wasIgnored = true;
-            var isEmpty = true;
-            var wasEmpty = true;
-            var isEndingByPunctuation = true;
-            var wasEndingByPunctuation = true;
+            let line;
+            let isIgnored = true;
+            let wasIgnored = true;
+            let isEmpty = true;
+            let wasEmpty = true;
+            let isEndingByPunctuation = true;
+            let wasEndingByPunctuation = true;
 
-            var i = 0;
-            var len = lines.length;
+            let i = 0;
+            let len = lines.length;
             for (i = 0; i < len; i++) {
                 wasIgnored = isIgnored;
                 if (!wasIgnored) {
@@ -290,10 +290,10 @@ module.exports = {
                     data: commentValid.data,
 
                     fix: function fix(fixer) {
-                        var newComment;
-                        var commentLine;
-                        var firstLetterIndex;
-                        var newCommentLine;
+                        let newComment;
+                        let commentLine;
+                        let firstLetterIndex;
+                        let newCommentLine;
                         switch (commentValid.message) {
                             case SPACE_ERROR_MESSAGE:
                                 return fixer.insertTextBefore(comment, ' ');
