@@ -93,13 +93,13 @@ ruleTester.run('file-format', rule, {
         }],
     }, {
         // eslint-disable-next-line max-len
-        code: "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n        function _toto() { console.log('coucou'); }\n})();\n",
+        code: "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n        function _toto() { console.log('coucou 1'); }\n})();\n",
         errors: [{
             message: MISSING_STUB_SEPARATOR_MESSAGE.PRIVATE_FUNCTIONS,
         }],
     }, {
         // eslint-disable-next-line max-len
-        code: "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n        function toto() { console.log('coucou'); }\n})();\n",
+        code: "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n        function toto() { console.log('coucou 2'); }\n})();\n",
         errors: [{
             message: MISSING_STUB_SEPARATOR_MESSAGE.PUBLIC_FUNCTIONS,
         }],

@@ -245,10 +245,10 @@ module.exports = function exportsFunction(context) {
         };
         const regexp = {
             EVENTS: /^\s{8}\$(rootScope|scope)\.\$on\(/,
-            PRIVATE_ATTRIBUTES: /^\s{8}(var|let) _[a-z][^ ]* = [^;]+;$/,
-            PRIVATE_FUNCTIONS: /^\s{8}function _[a-z][^(]*\([^)]*\) {/,
-            PUBLIC_ATTRIBUTES: /^\s{8}[a-z][^. ]*\.[a-z][^ ]* = [^;]+;$/,
-            PUBLIC_FUNCTIONS: /^\s{8}function [a-z][^(]*\([^)]*\) {/,
+            PRIVATE_ATTRIBUTES: /^\s{8}(var|let) _[a-z][^ ;]*( = [^;]+)?;?$/,
+            PRIVATE_FUNCTIONS: /^\s{8}function _[a-z][^(]*\([^)]*\)\s*{?/,
+            PUBLIC_ATTRIBUTES: /^\s{8}[a-z][^. ]*\.[a-z][^ ]* = [^;]+;?$/,
+            PUBLIC_FUNCTIONS: /^\s{8}function [a-z][^(]*\([^)]*\)\s*{?/,
             WATCHERS: /^\s{8}\$(rootScope|scope)\.\$watch(Collection)?\(/,
         };
 
