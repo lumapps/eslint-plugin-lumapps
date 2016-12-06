@@ -31,21 +31,53 @@ module.exports = {
          * @return {boolean} If there is a control flow statement inside the loop.
          */
         function hasControlledFlow(node) {
-            if (node.body === undefined && (!Array.isArray(node.body) || node.body.length === 0)) {
+            if (node.type === 'Function' || node.type === 'FunctionDeclaration') {
                 return false;
             }
 
-            if (!Array.isArray(node.body)) {
-                return hasControlledFlow(node.body);
+            var loopOver = [];
+
+            if (node.body !== undefined && node.body !== null) {
+                if (!Array.isArray(node.body)) {
+                    return hasControlledFlow(node.body);
+                }
+                loopOver = node.body;
             }
 
-            for (var i = 0, len = node.body.length; i < len; i++) {
-                var bodyNode = node.body[i];
-                if (bodyNode.type === 'ReturnStatement' ||
-                    bodyNode.type === 'BreakStatement' ||
-                    bodyNode.type === 'ContinueStatement' ||
-                    hasControlledFlow(bodyNode)) {
-                    return true;
+            if (node.consequent !== undefined && node.consequent !== null) {
+                if (!Array.isArray(node.consequent)) {
+                    return hasControlledFlow(node.consequent);
+                }
+                loopOver = node.consequent;
+            }
+            if (node.alternate !== undefined && node.alternate !== null) {
+                return hasControlledFlow(node.alternate);
+            }
+
+            if (node.cases !== undefined && node.cases !== null) {
+                loopOver = node.cases;
+            }
+
+            if (node.block !== undefined && node.block !== null) {
+                return hasControlledFlow(node.block);
+            }
+            if (node.handler !== undefined && node.handler !== null) {
+                return hasControlledFlow(node.handler);
+            }
+            if (node.finalizer !== undefined && node.finalizer !== null) {
+                return hasControlledFlow(node.finalizer);
+            }
+
+            if (loopOver.length > 0) {
+                for (var i = 0, len = loopOver.length; i < len; i++) {
+                    var bodyNode = node.body[i];
+
+                    if (bodyNode.type === 'ReturnStatement' ||
+                        bodyNode.type === 'BreakStatement' ||
+                        bodyNode.type === 'ContinueStatement' ||
+                        hasControlledFlow(bodyNode)) {
+                        return true;
+                    }
                 }
             }
 

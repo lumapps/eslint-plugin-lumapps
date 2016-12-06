@@ -43,10 +43,16 @@ ruleTester.run('angular-foreach', rule, {
             message: NEVER_MESSAGE,
         }],
         options: ['never'],
+    }, {
+        code: 'for (var i = 0; i < 1; i++) { console.log(i); function test() { return; } }',
+        errors: [{
+            message: ALWAYS_MESSAGE,
+        }],
     }],
 
     valid: [
         'angular.forEach([0], function forEach(i) { console.log(i); });',
+        'for (var i = 1; i < 1; i++) { console.log(i); if (i === 1) { break; } }',
         'for (var i = 1; i < 1; i++) { console.log(i); break; }',
         'for (var i = 2; i < 1; i++) { console.log(i); continue; }',
         'function toto() { for (var i = 3; i < 1; i++) { console.log(i); return; } }', {
