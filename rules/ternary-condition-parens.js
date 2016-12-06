@@ -47,14 +47,12 @@ module.exports = {
          * @param {boolean} expected   Whether parentheses around condition was expected or not.
          */
         function reportError(node, parentNode, expected) {
-            const token = sourceCode.getFirstToken(node, (node.async) ? 1 : 0);
-
             context.report({
                 data: {
                     expected: (expected) ? 'Expected' : 'Unexpected',
                 },
                 fix: function fix(fixer) {
-                    return fixer.replaceText(token, `(${token.value})`);
+                    return fixer.replaceText(node, `(${sourceCode.getText(node)})`);
                 },
                 message: '{{expected}} parentheses around condition of ternary expression.',
                 node: node,
