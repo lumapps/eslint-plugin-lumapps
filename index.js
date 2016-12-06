@@ -6,8 +6,9 @@
 
 module.exports = {
     rules: {
+        'angular-foreach': require('./rules/angular-foreach'),
         'comments-sentences': require('./rules/comments-sentences'),
-        'ternary-condition-parens': require('./rules/ternary-condition-parens'),
         'file-format': require('./rules/file-format'),
-    }
+        'ternary-condition-parens': require('./rules/ternary-condition-parens'),
+    },
 };
