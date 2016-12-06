@@ -9,7 +9,7 @@
 //------------------------------------------------------------------------------
 
 const FIRST_LETTER_PATTERN = require('eslint/lib/util/patterns/letters');
-const PUNCTUATION = /[!.?]$/;
+const PUNCTUATION = /[!.?]\s*$/;
 
 //------------------------------------------------------------------------------
 // Helpers
@@ -290,34 +290,71 @@ module.exports = {
                     data: commentValid.data,
 
                     fix: function fix(fixer) {
-                        var fixerResult;
-
+                        var newComment;
+                        var commentLine;
+                        var firstLetterIndex;
+                        var newCommentLine;
                         switch (commentValid.message) {
                             case SPACE_ERROR_MESSAGE:
-                                fixerResult = fixer.insertTextBefore(comment, ' ');
-                                break;
+                                return fixer.insertTextBefore(comment, ' ');
 
                             case UPPERCASE_ERROR_MESSAGE:
-                                var uppercaseComment = comment.value.charAt(0).toUpperCase() +
-                                    comment.value.substring(1);
-                                fixerResult = fixer.replaceText(comment, uppercaseComment);
+                                commentLine = (comment.type === 'Line' || comment.value.indexOf('\n') === -1) ?
+                                    commentValid.data.commentLine.trim() : commentValid.data.commentLine;
+
+                                firstLetterIndex = (/[a-z]/i).exec(commentLine).index;
+                                newCommentLine = commentLine.substring(0, firstLetterIndex) +
+                                    commentLine.charAt(firstLetterIndex).toUpperCase() +
+                                    commentLine.substring(firstLetterIndex + 1);
+
+                                newComment = comment.value.replace(
+                                    commentValid.data.commentLine,
+                                    newCommentLine
+                                );
                                 break;
 
                             case LOWERCASE_ERROR_MESSAGE:
-                                var lowerCaseComment = comment.value.charAt(0).toLowerCase() +
-                                    comment.value.substring(1);
-                                fixerResult = fixer.replaceText(comment, lowerCaseComment);
+                                commentLine = (comment.type === 'Line' || comment.value.indexOf('\n') === -1) ?
+                                    commentValid.data.commentLine.trim() : commentValid.data.commentLine;
+
+                                firstLetterIndex = (/[a-z]/i).exec(commentLine).index;
+                                newCommentLine = commentLine.substring(0, firstLetterIndex) +
+                                    commentLine.charAt(firstLetterIndex).toLowerCase() +
+                                    commentLine.substring(firstLetterIndex + 1);
+
+                                newComment = comment.value.replace(
+                                    commentValid.data.commentLine,
+                                    newCommentLine
+                                );
                                 break;
 
                             case PUNCTUATION_ERROR_MESSAGE:
-                                fixerResult = fixer.insertTextAfter(comment, '.');
+                                if (comment.type === 'Line' || comment.value.indexOf('\n') === -1) {
+                                    newComment = comment.value.trim() + '.';
+                                } else {
+                                    newComment = comment.value.replace(/\s*$/, function replace(match) {
+                                        return '.' + match;
+                                    });
+                                }
                                 break;
 
                             default:
                                 break;
                         }
 
-                        return fixerResult;
+                        if (newComment === undefined) {
+                            return undefined;
+                        }
+
+                        if (comment.type === 'Line') {
+                            newComment = '// ' + newComment;
+                        } else if (comment.value.indexOf('\n') === -1) {
+                            newComment = '/* ' + newComment + ' */';
+                        } else {
+                            newComment = '/*' + newComment + '*/';
+                        }
+
+                        return fixer.replaceText(comment, newComment);
                     },
 
                     loc: comment.loc,
