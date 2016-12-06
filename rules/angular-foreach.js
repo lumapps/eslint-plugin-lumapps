@@ -18,6 +18,8 @@
 //------------------------------------------------------------------------------
 module.exports = {
     create: function create(context) {
+        const sourceCode = context.getSourceCode();
+
         const angularForEach = context.options[0] !== 'never';
 
         //----------------------------------------------------------------------
@@ -117,7 +119,10 @@ module.exports = {
                 const hasControlledFlowInside = hasControlledFlow(node);
 
                 if (angularForEach && !hasControlledFlowInside) {
-                    reportError(node, true);
+                    let sourceCodeText = sourceCode.getText(node);
+                    if (sourceCodeText.indexOf('.length') > -1) {
+                        reportError(node, true);
+                    }
                 }
             },
             MemberExpression: function MemberExpression(node) {
