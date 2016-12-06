@@ -346,7 +346,7 @@
         "no-mixed-requires": "error",
         "no-mixed-spaces-and-tabs": "error",
         "no-multi-spaces": "error",
-        "no-multi-str": "error",
+        "no-multi-str": "off",
         "no-multiple-empty-lines": [
             "error",
             {
