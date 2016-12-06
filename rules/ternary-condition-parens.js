@@ -27,63 +27,73 @@
 //------------------------------------------------------------------------------
 // Rule Definition
 //------------------------------------------------------------------------------
-// {
-// meta: {
-//     docs: {
-//         description: 'enforce ternary\'s condition parentheses surrounding',
-//         category: 'Stylistic Issues',
-//         recommended: false
-//     },
-//     fixable: null,
-//     schema: [{
-//         enum: ["always", "never"]
-//     }]
-// },
+module.exports = {
+    create: function create(context) {
+        const sourceCode = context.getSourceCode();
 
-// create
-module.exports = function exportsFunction(context) {
-    const sourceCode = context.getSourceCode();
+        const parentheses = context.options[0] !== 'never';
 
-    const parentheses = context.options[0] !== 'never';
+        //----------------------------------------------------------------------
+        // Helpers
+        //----------------------------------------------------------------------
 
-    //----------------------------------------------------------------------
-    // Helpers
-    //----------------------------------------------------------------------
+        const astUtils = require('eslint/lib/ast-utils');
 
-    const astUtils = require('eslint/lib/ast-utils');
+        /**
+         * Report an error with a ternary.
+         *
+         * @param {ASTNode} node       The node to report.
+         * @param {ASTNode} parentNode The parent of the node to report.
+         * @param {boolean} expected   Whether parentheses around condition was expected or not.
+         */
+        function reportError(node, parentNode, expected) {
+            const token = sourceCode.getFirstToken(node, (node.async) ? 1 : 0);
 
-    /**
-     * Report an error with a ternary.
-     *
-     * @param {ASTNode} node       The node to report.
-     * @param {ASTNode} parentNode The parent of the node to report.
-     * @param {boolean} expected   Whether parentheses around condition was expected or not.
-     */
-    function reportError(node, parentNode, expected) {
-        context.report({
-            data: {
-                expected: (expected) ? 'Expected' : 'Unexpected',
-            },
-            message: '{{expected}} parentheses around condition of ternary expression.',
-            node: node,
-        });
-    }
+            context.report({
+                data: {
+                    expected: (expected) ? 'Expected' : 'Unexpected',
+                },
+                fix: function fix(fixer) {
+                    return fixer.replaceText(token, `(${token.value})`);
+                },
+                message: '{{expected}} parentheses around condition of ternary expression.',
+                node: node,
+            });
+        }
 
-    //----------------------------------------------------------------------
-    // Public
-    //----------------------------------------------------------------------
+        //----------------------------------------------------------------------
+        // Public
+        //----------------------------------------------------------------------
 
-    return {
-        ConditionalExpression: function ConditionalExpression(node) {
-            const isConditionSurroundedByParentheses = astUtils.isParenthesised(sourceCode, node.test);
+        return {
+            ConditionalExpression: function ConditionalExpression(node) {
+                const isConditionSurroundedByParentheses = astUtils.isParenthesised(sourceCode, node.test);
 
-            if (parentheses) {
-                if (!isConditionSurroundedByParentheses) {
-                    reportError(node.test, node, true);
+                if (parentheses) {
+                    if (!isConditionSurroundedByParentheses) {
+                        reportError(node.test, node, true);
+                    }
+                } else if (isConditionSurroundedByParentheses) {
+                    reportError(node.test, node, false);
                 }
-            } else if (isConditionSurroundedByParentheses) {
-                reportError(node.test, node, false);
-            }
+            },
+        };
+    },
+
+    meta: {
+        docs: {
+            category: 'Stylistic Issues',
+            description: 'enforce ternary\'s condition parentheses surrounding',
+            recommended: false,
         },
-    };
+        fixable: 'code',
+        schema: [
+            {
+                'enum': [
+                    'always',
+                    'never',
+                ],
+            },
+        ],
+    },
 };
