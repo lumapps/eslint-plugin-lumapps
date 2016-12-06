@@ -12,18 +12,6 @@
 // Helpers
 //------------------------------------------------------------------------------
 
-/*
- * Base schema body.
- * This can be used in a few different ways in the actual schema.
- *
- * @type {Object}
- */
-// const SCHEMA_BODY = {
-//     additionalProperties: false,
-//     properties: {},
-//     type: 'object',
-// };
-
 //------------------------------------------------------------------------------
 // Rule Definition
 //------------------------------------------------------------------------------
@@ -43,10 +31,9 @@ module.exports = {
          * Report an error with a ternary.
          *
          * @param {ASTNode} node       The node to report.
-         * @param {ASTNode} parentNode The parent of the node to report.
          * @param {boolean} expected   Whether parentheses around condition was expected or not.
          */
-        function reportError(node, parentNode, expected) {
+        function reportError(node, expected) {
             context.report({
                 data: {
                     expected: (expected) ? 'Expected' : 'Unexpected',
@@ -67,12 +54,10 @@ module.exports = {
             ConditionalExpression: function ConditionalExpression(node) {
                 const isConditionSurroundedByParentheses = astUtils.isParenthesised(sourceCode, node.test);
 
-                if (parentheses) {
-                    if (!isConditionSurroundedByParentheses) {
-                        reportError(node.test, node, true);
-                    }
-                } else if (isConditionSurroundedByParentheses) {
-                    reportError(node.test, node, false);
+                if (parentheses && !isConditionSurroundedByParentheses) {
+                    reportError(node.test, true);
+                } else if (!parentheses && isConditionSurroundedByParentheses) {
+                    reportError(node.test, false);
                 }
             },
         };
