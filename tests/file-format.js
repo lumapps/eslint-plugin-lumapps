@@ -143,7 +143,7 @@ ruleTester.run('file-format', rule, {
 
     valid: [
         // eslint-disable-next-line max-len
-        "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n    /////////////////////////////\n    //                         //\n    //    Private attributes   //\n    //                         //\n    /////////////////////////////\n\n        var _toto = 101;\n    console.log(_toto);\n})();\n",
+        "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n    /////////////////////////////\n    //                         //\n    //    Private attributes   //\n    //                         //\n    /////////////////////////////\n\n        var _toto = 101;\n    var ctrl = this;\n    var service = {};\n    console.log(_toto);\n})();\n",
         // eslint-disable-next-line max-len
         "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n    /////////////////////////////\n\n    /////////////////////////////\n    //                         //\n    //    Private attributes   //\n    //                         //\n    /////////////////////////////\n\n        var _toto = 102;\n\n    /////////////////////////////\n    //                         //\n    //    Private functions    //\n    //                         //\n    /////////////////////////////\n})();\n",
         // eslint-disable-next-line max-len
