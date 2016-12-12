@@ -325,7 +325,7 @@ module.exports = function exportsFunction(context) {
             });
 
             if ((/^\s{8}(var|let) [a-z][^ ]* = /).test(line) &&
-                line.indexOf(' = this;') === -1 && line.indexOf(' service = {};') === -1) {
+                line.indexOf(' = this;') === -1 && line.indexOf(' service = ') === -1) {
                 context.report({
                     data: `Expected private variable to be prefixed by "_"`,
                     loc: {
