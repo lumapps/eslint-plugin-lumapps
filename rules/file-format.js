@@ -12,6 +12,8 @@
 // Helpers
 //------------------------------------------------------------------------------
 
+const COMMENTS_REGEXP = /^\s*(([/]{2,}\s*.*)|([/]+[*]+\s*.*\s*[*]+[/]+)|([/][*]+)|([*]+\s*[^/]*)|[*]+[/])\s*$/;
+
 const FIRST_LINE = '(function IIFE() {';
 const FIRST_LINE_REGEXP = /^\s*\(function IIFE\(\) \{\s*$/;
 const FIRST_LINE_MESSAGE = 'First line of the file must be the IIFE function';
@@ -100,7 +102,17 @@ module.exports = function exportsFunction(context) {
     function checkFileFormat() {
         const lines = sourceCode.lines;
 
-        let firstLine = lines[0];
+        var lineIndex = 0;
+        let firstLine = lines[lineIndex];
+        while ((COMMENTS_REGEXP.test(firstLine) || firstLine === undefined || firstLine.length === 0) &&
+            lineIndex < lines.length) {
+            lineIndex++;
+            firstLine = lines[lineIndex];
+        }
+        if (lineIndex === lines.length) {
+            return;
+        }
+
         if (!FIRST_LINE_REGEXP.test(firstLine)) {
             context.report({
                 data: `Expected "${FIRST_LINE}"`,
@@ -154,14 +166,12 @@ module.exports = function exportsFunction(context) {
             });
         }
 
-        let comments = sourceCode.getAllComments();
-
         let line;
-        let i = 0;
+        let i = lineIndex;
         let len = lines.length;
-        for (i = 1; i < len; i++) {
+        for (i = (lineIndex + 1); i < len; i++) {
             line = lines[i];
-            if (comments.indexOf(line) > -1) {
+            if ((COMMENTS_REGEXP.test(line) || line === undefined || line.length === 0)) {
                 continue;
             }
 
@@ -192,7 +202,7 @@ module.exports = function exportsFunction(context) {
         let error = false;
         for (j = 0; j < len; j++) {
             line = lines[i];
-            if (comments.indexOf(line) > -1) {
+            if ((COMMENTS_REGEXP.test(line) || line === undefined || line.length === 0)) {
                 continue;
             }
 
@@ -252,7 +262,7 @@ module.exports = function exportsFunction(context) {
             WATCHERS: /^\s{8}\$(rootScope|scope)\.\$watch(Collection)?\(/,
         };
 
-        for (let k = 0; k < len; k++) {
+        for (let k = lineIndex; k < len; k++) {
             error = false;
             line = lines[k];
 
@@ -314,8 +324,7 @@ module.exports = function exportsFunction(context) {
                 }
             });
 
-            if ((/^\s{8}(var|let) [a-z][^ ]* = /).test(line) &&
-                !(/^\s{8}(var|let) [a-z][^ ]* = this;$/).test(line)) {
+            if ((/^\s{8}(var|let) [a-z][^ ]* = /).test(line) && line.indexOf(' = this;') === -1) {
                 context.report({
                     data: `Expected private variable to be prefixed by "_"`,
                     loc: {

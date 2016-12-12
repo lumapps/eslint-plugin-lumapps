@@ -150,5 +150,7 @@ ruleTester.run('file-format', rule, {
         "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n    function toto($scope) {\n        /////////////////////////////\n        //                         //\n        //        Watchers         //\n        //                         //\n        /////////////////////////////\n\n        $scope.$watch('toto', function() { console.log('toto'); });\n    }\n})();\n",
         // eslint-disable-next-line max-len
         "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n    function toto($scope) {\n        /////////////////////////////\n        //                         //\n        //          Events         //\n        //                         //\n        /////////////////////////////\n\n        $scope.$on('toto', function() { console.log('toto'); });\n    }\n})();\n",
+        // eslint-disable-next-line max-len
+        "// Toto.\n/* Tata. */\n/**\n * Titi.\n * Toto.\n */\n\n(function IIFE() {\n    // This is a comment.\n\n    'use strict';\n\n    /////////////////////////////\n})();\n",
     ],
 });
