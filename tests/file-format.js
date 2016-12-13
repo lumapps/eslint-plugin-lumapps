@@ -91,6 +91,9 @@ ruleTester.run('file-format', rule, {
         errors: [{
             message: MISSING_STUB_SEPARATOR_MESSAGE.PUBLIC_ATTRIBUTES,
         }],
+        options: [{
+            ignorePrivatePattern: '\\s*(([^ ]+S|s)(ervice|vc)[^ ]*\\s*=\\s*{}|([^ ]+)\\s*=\\s*this);$',
+        }],
     }, {
         // eslint-disable-next-line max-len
         code: "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n        function _toto() { console.log('coucou 1'); }\n})();\n",
@@ -142,8 +145,13 @@ ruleTester.run('file-format', rule, {
     }],
 
     valid: [
-        // eslint-disable-next-line max-len
-        "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n    /////////////////////////////\n    //                         //\n    //    Private attributes   //\n    //                         //\n    /////////////////////////////\n\n        var _toto = 101;\n    var ctrl = this;\n    var service = {};\n    console.log(_toto);\n})();\n",
+        {
+            // eslint-disable-next-line max-len
+            code: "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n    /////////////////////////////\n    //                         //\n    //    Private attributes   //\n    //                         //\n    /////////////////////////////\n\n        var _toto = 101;\n    var ctrl = this;\n    var service1 = {};\n    console.log(_toto);\n})();\n",
+            options: [{
+                ignorePrivatePattern: '\\s*(([^ ]+S|s)(ervice|vc)[^ ]*\\s*=\\s*{}|(.+)\\s*=\\s*this);$',
+            }],
+        },
         // eslint-disable-next-line max-len
         "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n    /////////////////////////////\n\n    /////////////////////////////\n    //                         //\n    //    Private attributes   //\n    //                         //\n    /////////////////////////////\n\n        var _toto = 102;\n\n    /////////////////////////////\n    //                         //\n    //    Private functions    //\n    //                         //\n    /////////////////////////////\n})();\n",
         // eslint-disable-next-line max-len
@@ -152,5 +160,12 @@ ruleTester.run('file-format', rule, {
         "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n    function toto($scope) {\n        /////////////////////////////\n        //                         //\n        //          Events         //\n        //                         //\n        /////////////////////////////\n\n        $scope.$on('toto', function() { console.log('toto'); });\n    }\n})();\n",
         // eslint-disable-next-line max-len
         "// Toto.\n/* Tata. */\n/**\n * Titi.\n * Toto.\n */\n\n(function IIFE() {\n    // This is a comment.\n\n    'use strict';\n\n    /////////////////////////////\n})();\n",
+        {
+            // eslint-disable-next-line max-len
+            code: "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n        var testService2 = {};\n\n    /////////////////////////////\n\n    /////////////////////////////\n    //                         //\n    //    Private attributes   //\n    //                         //\n    /////////////////////////////\n\n    /////////////////////////////\n    //                         //\n    //    Private functions    //\n    //                         //\n    /////////////////////////////\n})();\n",
+            options: [{
+                ignorePrivatePattern: '\\s*(([^ ]+S|s)(ervice|vc)[^ ]*\\s*=\\s*{}|([^ ]+)\\s*=\\s*this);$',
+            }],
+        },
     ],
 });

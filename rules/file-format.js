@@ -12,6 +12,11 @@
 // Helpers
 //------------------------------------------------------------------------------
 
+const DEFAULTS = {
+    ignorePrivateFormat: false,
+    ignorePrivatePattern: null,
+};
+
 const COMMENTS_REGEXP = /^\s*(([/]{2,}\s*.*)|([/]+[*]+\s*.*\s*[*]+[/]+)|([/][*]+)|([*]+\s*[^/]*)|[*]+[/])\s*$/;
 
 const FIRST_LINE = '(function IIFE() {';
@@ -68,245 +73,234 @@ const PRIVATE_VARIABLE_PREFIXED = 'Expected private variable to be prefixed by "
  *
  * @type {Object}
  */
-// const SCHEMA_BODY = {
-//     additionalProperties: false,
-//     properties: {},
-//     type: 'object',
-// };
+const SCHEMA_BODY = {
+    additionalProperties: false,
+    properties: {
+        ignorePrivateFormat: {
+            type: 'boolean',
+        },
+        ignorePrivatePattern: {
+            type: 'string',
+        },
+    },
+    type: 'object',
+};
+
+/**
+ * Get normalized options for either block or line comments from the given user-provided options.
+ *     - If the user-provided options is just a string, returns a normalized set of options using default values for all
+ *       other options.
+ *     - If the user-provided options is an object, then a normalized option set is returned. Options specified in
+ *       overrides will take priority over options specified in the main options object, which will in turn take
+ *       priority over the rule's defaults.
+ *
+ * @param  {Object|string} rawOptions The user-provided options.
+ * @return {Object}        The normalized options.
+ */
+function getNormalizedOptions(rawOptions) {
+    if (rawOptions === undefined) {
+        return Object.assign({}, DEFAULTS);
+    }
+
+    return Object.assign({}, DEFAULTS, rawOptions);
+}
 
 //------------------------------------------------------------------------------
 // Rule Definition
 //------------------------------------------------------------------------------
-// {
-// meta: {
-//     docs: {
-//         description: 'enforce the file format',
-//         category: 'Stylistic Issues',
-//         recommended: false
-//     },
-//     fixable: null,
-//     schema: [{}]
-// },
 
-// create
-module.exports = function exportsFunction(context) {
-    const sourceCode = context.getSourceCode();
+module.exports = {
+    create: function create(context) {
+        const normalizedOptions = getNormalizedOptions(context.options[0]);
 
-    //----------------------------------------------------------------------
-    // Helpers
-    //----------------------------------------------------------------------
+        const sourceCode = context.getSourceCode();
 
-    /**
-     * Process a file to determine if it has the right format.
-     */
-    function checkFileFormat() {
-        const lines = sourceCode.lines;
+        //----------------------------------------------------------------------
+        // Helpers
+        //----------------------------------------------------------------------
 
-        var lineIndex = 0;
-        let firstLine = lines[lineIndex];
-        while ((COMMENTS_REGEXP.test(firstLine) || firstLine === undefined || firstLine.length === 0) &&
-            lineIndex < lines.length) {
-            lineIndex++;
-            firstLine = lines[lineIndex];
-        }
-        if (lineIndex === lines.length) {
-            return;
-        }
+        /**
+         * Process a file to determine if it has the right format.
+         */
+        function checkFileFormat() {
+            const lines = sourceCode.lines;
 
-        if (!FIRST_LINE_REGEXP.test(firstLine)) {
-            context.report({
-                data: `Expected "${FIRST_LINE}"`,
-                loc: {
-                    end: {
-                        line: 1,
-                    },
-                    start: {
-                        line: 1,
-                    },
-                },
-                message: FIRST_LINE_MESSAGE,
-
-                node: null,
-            });
-        }
-
-        let lastLine = lines[lines.length - 1];
-        if (lastLine.length === 0) {
-            let lastTextLine = lines[lines.length - 2];
-            if (!LAST_LINE_REGEXP.test(lastTextLine)) {
-                context.report({
-                    data: `Expected "${LAST_LINE}"`,
-                    loc: {
-                        end: {
-                            line: lines.length - 1,
-                        },
-                        start: {
-                            line: lines.length - 1,
-                        },
-                    },
-                    message: LAST_LINE_MESSAGE,
-
-                    node: null,
-                });
+            var lineIndex = 0;
+            let firstLine = lines[lineIndex];
+            while ((COMMENTS_REGEXP.test(firstLine) || firstLine === undefined || firstLine.length === 0) &&
+                lineIndex < lines.length) {
+                lineIndex++;
+                firstLine = lines[lineIndex];
             }
-        } else {
-            context.report({
-                data: `Expected an empty line`,
-                loc: {
-                    end: {
-                        line: lines.length,
-                    },
-                    start: {
-                        line: lines.length,
-                    },
-                },
-                message: EMPTY_LINE_MESSAGE,
-
-                node: null,
-            });
-        }
-
-        let line;
-        let i = lineIndex;
-        let len = lines.length;
-        for (i = (lineIndex + 1); i < len; i++) {
-            line = lines[i];
-            if ((COMMENTS_REGEXP.test(line) || line === undefined || line.length === 0)) {
-                continue;
-            }
-
-            if (!USE_STRICT_REGEXP.test(line)) {
-                context.report({
-                    data: `Expected "${USE_STRICT}"`,
-                    loc: {
-                        end: {
-                            line: i + 1,
-                        },
-                        start: {
-                            line: i + 1,
-                        },
-                    },
-                    message: MISSING_STRICT_MESSAGE,
-
-                    node: null,
-                });
-
+            if (lineIndex === lines.length) {
                 return;
             }
 
-            break;
-        }
-
-        i++;
-        let j = 0;
-        let error = false;
-        for (j = 0; j < len; j++) {
-            line = lines[i];
-            if ((COMMENTS_REGEXP.test(line) || line === undefined || line.length === 0)) {
-                continue;
-            }
-
-            if ((j === 0 || j === 2) && line.length !== 0) {
-                error = true;
-                break;
-            } else if (j === 1 && !SEPARATOR_REGEXP.test(line)) {
-                error = true;
-                break;
-            }
-
-            if (j > 2) {
-                break;
-            }
-
-            i++;
-        }
-        if (error) {
-            context.report({
-                data: `Expected "${SEPARATOR}"`,
-                loc: {
-                    end: {
-                        line: i + 1,
+            if (!FIRST_LINE_REGEXP.test(firstLine)) {
+                context.report({
+                    data: `Expected "${FIRST_LINE}"`,
+                    loc: {
+                        end: {
+                            line: 1,
+                        },
+                        start: {
+                            line: 1,
+                        },
                     },
-                    start: {
-                        line: i + 1,
-                    },
-                },
-                message: MISSING_SEPARATOR_MESSAGE,
+                    message: FIRST_LINE_MESSAGE,
 
-                node: null,
-            });
-        }
+                    node: null,
+                });
+            }
 
-        let seen = {
-            EVENTS: false,
-            PRIVATE_ATTRIBUTES: false,
-            PRIVATE_FUNCTIONS: false,
-            PUBLIC_ATTRIBUTES: false,
-            PUBLIC_FUNCTIONS: false,
-            WATCHERS: false,
-        };
-        let first = {
-            EVENTS: true,
-            PRIVATE_ATTRIBUTES: true,
-            PRIVATE_FUNCTIONS: true,
-            PUBLIC_ATTRIBUTES: true,
-            PUBLIC_FUNCTIONS: true,
-            WATCHERS: true,
-        };
-        const regexp = {
-            EVENTS: /^\s{8}\$(rootScope|scope)\.\$on\(/,
-            PRIVATE_ATTRIBUTES: /^\s{8}(var|let) _[a-z][^ ;]*( = [^;]+)?;?$/,
-            PRIVATE_FUNCTIONS: /^\s{8}function _[a-z][^(]*\([^)]*\)\s*{?/,
-            PUBLIC_ATTRIBUTES: /^\s{8}[a-z][^. ]*\.[a-z][^ ]* = [^;]+;?$/,
-            PUBLIC_FUNCTIONS: /^\s{8}function [a-z][^(]*\([^)]*\)\s*{?/,
-            WATCHERS: /^\s{8}\$(rootScope|scope)\.\$watch(Collection)?\(/,
-        };
-
-        for (let k = lineIndex; k < len; k++) {
-            error = false;
-            line = lines[k];
-
-            // eslint-disable-next-line no-loop-func
-            Object.keys(regexp).forEach(function forEachRegexp(regexpName) {
-                if (!seen[regexpName] && SEPARATORS_REGEXP[regexpName].test(line)) {
-                    if (!SEPARATORS[regexpName].test(line) ||
-                        !SEPARATOR_REGEXP.test(lines[k - 2]) || !EMPTY_SEPARATOR_REGEXP.test(lines[k - 1]) ||
-                        !SEPARATOR_REGEXP.test(lines[k + 2]) || !EMPTY_SEPARATOR_REGEXP.test(lines[k + 1])) {
-                        error = true;
-
-                        let expectedSeparator =
-                            `${SEPARATOR}\n${EMPTY_SEPARATOR}\n${line.trim()}\n${EMPTY_SEPARATOR}${SEPARATOR}\n`;
-                        context.report({
-                            data: `Expected "${expectedSeparator}" before and after`,
-                            loc: {
-                                end: {
-                                    line: k + 1,
-                                },
-                                start: {
-                                    line: k + 1,
-                                },
+            let lastLine = lines[lines.length - 1];
+            if (lastLine.length === 0) {
+                let lastTextLine = lines[lines.length - 2];
+                if (!LAST_LINE_REGEXP.test(lastTextLine)) {
+                    context.report({
+                        data: `Expected "${LAST_LINE}"`,
+                        loc: {
+                            end: {
+                                line: lines.length - 1,
                             },
-                            message: SEPARATOR_FORMAT_MESSAGE,
+                            start: {
+                                line: lines.length - 1,
+                            },
+                        },
+                        message: LAST_LINE_MESSAGE,
 
-                            node: null,
-                        });
-                    }
+                        node: null,
+                    });
+                }
+            } else {
+                context.report({
+                    data: `Expected an empty line`,
+                    loc: {
+                        end: {
+                            line: lines.length,
+                        },
+                        start: {
+                            line: lines.length,
+                        },
+                    },
+                    message: EMPTY_LINE_MESSAGE,
 
-                    if (!error) {
-                        seen[regexpName] = true;
+                    node: null,
+                });
+            }
 
-                        k += 3;
-                    }
+            let line;
+            let i = lineIndex;
+            let len = lines.length;
+            for (i = (lineIndex + 1); i < len; i++) {
+                line = lines[i];
+                if ((COMMENTS_REGEXP.test(line) || line === undefined || line.length === 0)) {
+                    continue;
+                }
+
+                if (!USE_STRICT_REGEXP.test(line)) {
+                    context.report({
+                        data: `Expected "${USE_STRICT}"`,
+                        loc: {
+                            end: {
+                                line: i + 1,
+                            },
+                            start: {
+                                line: i + 1,
+                            },
+                        },
+                        message: MISSING_STRICT_MESSAGE,
+
+                        node: null,
+                    });
 
                     return;
                 }
 
-                if (first[regexpName]) {
-                    if (regexp[regexpName].test(line)) {
-                        first[regexpName] = false;
+                break;
+            }
 
-                        if (!seen[regexpName]) {
+            i++;
+            let j = 0;
+            let error = false;
+            for (j = 0; j < len; j++) {
+                line = lines[i];
+                if ((COMMENTS_REGEXP.test(line) || line === undefined || line.length === 0)) {
+                    continue;
+                }
+
+                if ((j === 0 || j === 2) && line.length !== 0) {
+                    error = true;
+                    break;
+                } else if (j === 1 && !SEPARATOR_REGEXP.test(line)) {
+                    error = true;
+                    break;
+                }
+
+                if (j > 2) {
+                    break;
+                }
+
+                i++;
+            }
+            if (error) {
+                context.report({
+                    data: `Expected "${SEPARATOR}"`,
+                    loc: {
+                        end: {
+                            line: i + 1,
+                        },
+                        start: {
+                            line: i + 1,
+                        },
+                    },
+                    message: MISSING_SEPARATOR_MESSAGE,
+
+                    node: null,
+                });
+            }
+
+            let seen = {
+                EVENTS: false,
+                PRIVATE_ATTRIBUTES: false,
+                PRIVATE_FUNCTIONS: false,
+                PUBLIC_ATTRIBUTES: false,
+                PUBLIC_FUNCTIONS: false,
+                WATCHERS: false,
+            };
+            let first = {
+                EVENTS: true,
+                PRIVATE_ATTRIBUTES: true,
+                PRIVATE_FUNCTIONS: true,
+                PUBLIC_ATTRIBUTES: true,
+                PUBLIC_FUNCTIONS: true,
+                WATCHERS: true,
+            };
+            const regexp = {
+                EVENTS: /^\s{8}\$(rootScope|scope)\.\$on\(/,
+                PRIVATE_ATTRIBUTES: /^\s{8}(var|let) _[a-z][^ ;]*( = [^;]+)?;?$/,
+                PRIVATE_FUNCTIONS: /^\s{8}function _[a-z][^(]*\([^)]*\)\s*{?/,
+                PUBLIC_ATTRIBUTES: /^\s{8}[a-z][^. ]*\.[a-z][^ ]* = [^;]+;?$/,
+                PUBLIC_FUNCTIONS: /^\s{8}function [a-z][^(]*\([^)]*\)\s*{?/,
+                WATCHERS: /^\s{8}\$(rootScope|scope)\.\$watch(Collection)?\(/,
+            };
+
+            for (let k = lineIndex; k < len; k++) {
+                error = false;
+                line = lines[k];
+
+                // eslint-disable-next-line no-loop-func
+                Object.keys(regexp).forEach(function forEachRegexp(regexpName) {
+                    if (!seen[regexpName] && SEPARATORS_REGEXP[regexpName].test(line)) {
+                        if (!SEPARATORS[regexpName].test(line) ||
+                            !SEPARATOR_REGEXP.test(lines[k - 2]) || !EMPTY_SEPARATOR_REGEXP.test(lines[k - 1]) ||
+                            !SEPARATOR_REGEXP.test(lines[k + 2]) || !EMPTY_SEPARATOR_REGEXP.test(lines[k + 1])) {
+                            error = true;
+
+                            let expectedSeparator =
+                                `${SEPARATOR}\n${EMPTY_SEPARATOR}\n${line.trim()}\n${EMPTY_SEPARATOR}${SEPARATOR}\n`;
                             context.report({
+                                data: `Expected "${expectedSeparator}" before and after`,
                                 loc: {
                                     end: {
                                         line: k + 1,
@@ -315,42 +309,90 @@ module.exports = function exportsFunction(context) {
                                         line: k + 1,
                                     },
                                 },
-                                message: MISSING_STUB_SEPARATOR_MESSAGE[regexpName],
+                                message: SEPARATOR_FORMAT_MESSAGE,
 
                                 node: null,
                             });
                         }
+
+                        if (!error) {
+                            seen[regexpName] = true;
+
+                            k += 3;
+                        }
+
+                        return;
                     }
-                }
-            });
 
-            if ((/^\s{8}(var|let) [a-z][^ ]* = /).test(line) &&
-                line.indexOf(' = this;') === -1 && line.indexOf(' service = ') === -1) {
-                context.report({
-                    data: `Expected private variable to be prefixed by "_"`,
-                    loc: {
-                        end: {
-                            line: k + 1,
-                        },
-                        start: {
-                            line: k + 1,
-                        },
-                    },
-                    message: PRIVATE_VARIABLE_PREFIXED,
+                    if (first[regexpName]) {
+                        if (regexp[regexpName].test(line)) {
+                            first[regexpName] = false;
 
-                    node: null,
+                            if (!seen[regexpName]) {
+                                context.report({
+                                    loc: {
+                                        end: {
+                                            line: k + 1,
+                                        },
+                                        start: {
+                                            line: k + 1,
+                                        },
+                                    },
+                                    message: MISSING_STUB_SEPARATOR_MESSAGE[regexpName],
+
+                                    node: null,
+                                });
+                            }
+                        }
+                    }
                 });
+
+                if (normalizedOptions.ignorePrivateFormat === true) {
+                    continue;
+                }
+
+                if ((/^\s{8}(var|let) [a-z][^ ]* = /).test(line) &&
+                    (normalizedOptions.ignorePrivatePattern === undefined ||
+                    normalizedOptions.ignorePrivatePattern === null ||
+                    !RegExp(normalizedOptions.ignorePrivatePattern).test(line))) {
+                    context.report({
+                        data: `Expected private variable to be prefixed by "_"`,
+                        loc: {
+                            end: {
+                                line: k + 1,
+                            },
+                            start: {
+                                line: k + 1,
+                            },
+                        },
+                        message: PRIVATE_VARIABLE_PREFIXED,
+
+                        node: null,
+                    });
+                }
             }
         }
-    }
 
-    //----------------------------------------------------------------------
-    // Public
-    //----------------------------------------------------------------------
+        //----------------------------------------------------------------------
+        // Public
+        //----------------------------------------------------------------------
 
-    return {
-        Program: function Program() {
-            checkFileFormat();
+        return {
+            Program: function Program() {
+                checkFileFormat();
+            },
+        };
+    },
+
+    meta: {
+        docs: {
+            category: 'Best Practices',
+            description: 'enforce a specific file format',
+            recommended: false,
         },
-    };
+        fixable: null,
+        schema: [
+            SCHEMA_BODY,
+        ],
+    },
 };
