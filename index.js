@@ -10,5 +10,6 @@ module.exports = {
         'comments-sentences': require('./rules/comments-sentences'),
         'file-format': require('./rules/file-format'),
         'ternary-condition-parens': require('./rules/ternary-condition-parens'),
+        'underscore-isempty': require('./rules/underscore-isempty'),
     },
 };
