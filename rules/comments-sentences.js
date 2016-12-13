@@ -96,6 +96,7 @@ function getNormalizedOptions(rawOptions) {
 module.exports = {
     create: function create(context) {
         const normalizedOptions = getNormalizedOptions(context.options[0]);
+
         const sourceCode = context.getSourceCode();
 
         //----------------------------------------------------------------------
