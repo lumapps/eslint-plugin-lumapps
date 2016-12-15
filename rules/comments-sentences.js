@@ -1,5 +1,5 @@
 /**
- * @fileoverview enforce that comments are correct sentences
+ * @fileoverview Enforce that comments are correct sentences.
  * @author Clément P.
  */
 'use strict';
@@ -15,21 +15,16 @@ const PUNCTUATION = /[!.?]\s*$/;
 // Helpers
 //------------------------------------------------------------------------------
 
-const DEFAULT_IGNORE_PATTERN = /^\s*(?:eslint|istanbul|jscs|jshint|globals?|exported|@.+)\b/;
 const WHITESPACE = /\s/g;
 const MAYBE_URL = /^\s*[^:/?#\s]+:\/\/[^?#]/;
-const DEFAULTS = {
-    ignoreInlineComments: false,
-    ignorePattern: null,
-};
 
-const SPACE_ERROR_MESSAGE = 'Not starting by spaces';
-const UPPERCASE_ERROR_MESSAGE = 'Not starting by an uppercase letter while it should';
-const LOWERCASE_ERROR_MESSAGE = 'Starting by an uppercase letter while it should not';
-const PUNCTUATION_ERROR_MESSAGE = 'Line does not end by a punctuation';
+const SPACE_ERROR_MESSAGE = 'Not starting by spaces.';
+const UPPERCASE_ERROR_MESSAGE = 'Not starting by an uppercase letter while it should.';
+const LOWERCASE_ERROR_MESSAGE = 'Starting by an uppercase letter while it should not.';
+const PUNCTUATION_ERROR_MESSAGE = 'Line does not end by a punctuation.';
 
 /*
- * Base schema body for defining the basic pattern, ignorePattern, and ignoreInlineComments values.
+ * Base schema body for defining the basic pattern, a pattern to ignore and if we want to ignore inline comments values.
  * This can be used in a few different ways in the actual schema.
  *
  * @type {Object}
@@ -46,6 +41,12 @@ const SCHEMA_BODY = {
     },
     type: 'object',
 };
+
+const DEFAULTS = {
+    ignoreInlineComments: false,
+    ignorePattern: null,
+};
+const DEFAULT_IGNORE_PATTERN = /^\s*(?:eslint|istanbul|jscs|jshint|globals?|exported|@.+)\b/;
 
 /**
  * Get all the variables of the global scope and all child scopes of the current context.
@@ -388,8 +389,8 @@ module.exports = {
     meta: {
         docs: {
             category: 'Stylistic Issues',
-            description: 'enforce that comments are correct sentences (basically starting with an upper case letter and\
-                          ending with a dot',
+            description: 'Enforce that comments are correct sentences (basically starting with an upper case letter and\
+                          ending with a dot.',
             recommended: false,
         },
         fixable: 'code',

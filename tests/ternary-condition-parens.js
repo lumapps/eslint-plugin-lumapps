@@ -1,5 +1,5 @@
 /**
- * @fileoverview enforce parentheses around ternary's conditions
+ * @fileoverview Enforce parentheses around ternary's conditions.
  * @author Clément P.
  */
 'use strict';
@@ -25,27 +25,30 @@ const NEVER_MESSAGE = 'Unexpected parentheses around condition of ternary expres
 
 const ruleTester = new RuleTester();
 ruleTester.run('ternary-condition-parens', rule, {
-    invalid: [{
-        code: 'true ? true : false',
-        errors: [{
-            message: ALWAYS_MESSAGE,
-        }],
-    }, {
-        code: 'true ? true : false',
-        errors: [{
-            message: ALWAYS_MESSAGE,
-        }],
-        options: ['always'],
-    }, {
-        code: '(true) ? true : false',
-        errors: [{
-            message: NEVER_MESSAGE,
-        }],
-        options: ['never'],
-    }],
+    invalid: [
+        {
+            code: 'true ? true : false',
+            errors: [{
+                message: ALWAYS_MESSAGE,
+            }],
+        }, {
+            code: 'true ? true : false',
+            errors: [{
+                message: ALWAYS_MESSAGE,
+            }],
+            options: ['always'],
+        }, {
+            code: '(true) ? true : false',
+            errors: [{
+                message: NEVER_MESSAGE,
+            }],
+            options: ['never'],
+        },
+    ],
 
     valid: [
-        '(true) ? true : false', {
+        '(true) ? true : false',
+        {
             code: '(true) ? true : false',
             options: ['always'],
         }, {

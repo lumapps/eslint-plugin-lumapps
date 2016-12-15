@@ -1,5 +1,5 @@
 /**
- * @fileoverview enforce the usage of "angular.is[Un]defined[AndFilled|OrEmpty]" instead of "_.isEmpty"
+ * @fileoverview Enforce the usage of "angular.is[Un]defined[AndFilled|OrEmpty]" instead of "_.isEmpty".
  * @author Clément P.
  */
 'use strict';
@@ -26,59 +26,61 @@ const NEVER_MESSAGE = 'You should use "_.isEmpty" instead.';
 
 const ruleTester = new RuleTester();
 ruleTester.run('underscore-isempty', rule, {
-    invalid: [{
-        code: 'if (_.isEmpty(toto1)) { console.log(toto); }',
-        errors: [{
-            message: ALWAYS_UNDEFINED_MESSAGE,
-        }],
-    }, {
-        code: 'if (_.isEmpty(toto2)) { console.log(toto); }',
-        errors: [{
-            message: ALWAYS_UNDEFINED_MESSAGE,
-        }],
-        options: ['always'],
-    }, {
-        code: 'if (!_.isEmpty(toto3)) { console.log(toto); }',
-        errors: [{
-            message: ALWAYS_DEFINED_MESSAGE,
-        }],
-    }, {
-        code: 'if (!_.isEmpty(toto4)) { console.log(toto); }',
-        errors: [{
-            message: ALWAYS_DEFINED_MESSAGE,
-        }],
-        options: ['always'],
-    }, {
-        code: 'if (angular.isDefinedAndFilled(toto5)) { console.log(toto); }',
-        errors: [{
-            message: NEVER_MESSAGE,
-        }],
-        options: ['never'],
-    }, {
-        code: 'if (angular.isUndefinedOrEmpty(toto6)) { console.log(toto); }',
-        errors: [{
-            message: NEVER_MESSAGE,
-        }],
-        options: ['never'],
-    }, {
-        code: 'if (toto7.length) { console.log(toto); }',
-        errors: [{
-            message: ALWAYS_DEFINED_MESSAGE,
-        }],
-        options: ['always'],
-    }, {
-        code: 'if (toto8.length > 0) { console.log(toto); }',
-        errors: [{
-            message: ALWAYS_DEFINED_MESSAGE,
-        }],
-        options: ['always'],
-    }, {
-        code: 'if (toto8.length === 0) { console.log(toto); }',
-        errors: [{
-            message: ALWAYS_UNDEFINED_MESSAGE,
-        }],
-        options: ['always'],
-    }],
+    invalid: [
+        {
+            code: 'if (_.isEmpty(toto1)) { console.log(toto); }',
+            errors: [{
+                message: ALWAYS_UNDEFINED_MESSAGE,
+            }],
+        }, {
+            code: 'if (_.isEmpty(toto2)) { console.log(toto); }',
+            errors: [{
+                message: ALWAYS_UNDEFINED_MESSAGE,
+            }],
+            options: ['always'],
+        }, {
+            code: 'if (!_.isEmpty(toto3)) { console.log(toto); }',
+            errors: [{
+                message: ALWAYS_DEFINED_MESSAGE,
+            }],
+        }, {
+            code: 'if (!_.isEmpty(toto4)) { console.log(toto); }',
+            errors: [{
+                message: ALWAYS_DEFINED_MESSAGE,
+            }],
+            options: ['always'],
+        }, {
+            code: 'if (angular.isDefinedAndFilled(toto5)) { console.log(toto); }',
+            errors: [{
+                message: NEVER_MESSAGE,
+            }],
+            options: ['never'],
+        }, {
+            code: 'if (angular.isUndefinedOrEmpty(toto6)) { console.log(toto); }',
+            errors: [{
+                message: NEVER_MESSAGE,
+            }],
+            options: ['never'],
+        }, {
+            code: 'if (toto7.length) { console.log(toto); }',
+            errors: [{
+                message: ALWAYS_DEFINED_MESSAGE,
+            }],
+            options: ['always'],
+        }, {
+            code: 'if (toto8.length > 0) { console.log(toto); }',
+            errors: [{
+                message: ALWAYS_DEFINED_MESSAGE,
+            }],
+            options: ['always'],
+        }, {
+            code: 'if (toto8.length === 0) { console.log(toto); }',
+            errors: [{
+                message: ALWAYS_UNDEFINED_MESSAGE,
+            }],
+            options: ['always'],
+        },
+    ],
 
     valid: [
         'if (angular.isDefinedAndFilled(toto1)) { console.log(toto); }',
@@ -90,12 +92,10 @@ ruleTester.run('underscore-isempty', rule, {
         {
             code: 'if (angular.isUndefinedOrEmpty(toto4)) { console.log(toto); }',
             options: ['always'],
-        },
-        {
+        }, {
             code: 'if (_.isEmpty(toto5)) { console.log(toto); }',
             options: ['never'],
-        },
-        {
+        }, {
             code: 'if (!_.isEmpty(toto6)) { console.log(toto); }',
             options: ['never'],
         }, {

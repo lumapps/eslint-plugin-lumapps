@@ -1,6 +1,6 @@
 /**
- * @fileoverview enforce the usage of "angular.forEach" instead of "for" when there is no need of flow control (return,
- *               break or continue)
+ * @fileoverview Enforce the usage of "angular.forEach" instead of "for" when there is no need of flow control (return,
+ *               break or continue).
  * @author Clément P.
  */
 'use strict';
@@ -13,6 +13,17 @@
 // Helpers
 //------------------------------------------------------------------------------
 
+/*
+ * Base schema body for defining the property "always"/"never" of the rule.
+ *
+ * @type {Object}
+ */
+const SCHEMA_BODY = {
+    'enum': [
+        'always',
+        'never',
+    ],
+};
 //------------------------------------------------------------------------------
 // Rule Definition
 //------------------------------------------------------------------------------
@@ -134,18 +145,13 @@ module.exports = {
     meta: {
         docs: {
             category: 'Best Practices',
-            description: 'enforce the usage of "angular.forEach" instead of "for" when there is no need of execution\
-                          control (return, break or continue)',
+            description: 'Enforce the usage of "angular.forEach" instead of "for" when there is no need of execution\
+                          control (return, break or continue).',
             recommended: false,
         },
         fixable: null,
         schema: [
-            {
-                'enum': [
-                    'always',
-                    'never',
-                ],
-            },
+            SCHEMA_BODY,
         ],
     },
 };

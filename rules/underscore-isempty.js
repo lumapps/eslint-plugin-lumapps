@@ -1,5 +1,5 @@
 /**
- * @fileoverview enforce the usage of "angular.is[Un]defined[AndFilled|OrEmpty]" instead of "_.isEmpty"
+ * @fileoverview Enforce the usage of "angular.is[Un]defined[AndFilled|OrEmpty]" instead of "_.isEmpty".
  * @author Clément P.
  */
 'use strict';
@@ -14,6 +14,18 @@
 const ALWAYS_DEFINED_MESSAGE = 'You should use "angular.isDefinedAndFilled" instead.';
 const ALWAYS_UNDEFINED_MESSAGE = 'You should use "angular.isUndefinedOrEmpty" instead.';
 const NEVER_MESSAGE = 'You should use "_.isEmpty" instead.';
+
+/*
+ * Base schema body for defining the property "always"/"never" of the rule.
+ *
+ * @type {Object}
+ */
+const SCHEMA_BODY = {
+    'enum': [
+        'always',
+        'never',
+    ],
+};
 
 //------------------------------------------------------------------------------
 // Rule Definition
@@ -71,17 +83,12 @@ module.exports = {
     meta: {
         docs: {
             category: 'Best Practices',
-            description: 'enforce the usage of "angular.is[Un]defined[AndFilled|OrEmpty]" instead of "_.isEmpty"',
+            description: 'Enforce the usage of "angular.is[Un]defined[AndFilled|OrEmpty]" instead of "_.isEmpty".',
             recommended: false,
         },
         fixable: null,
         schema: [
-            {
-                'enum': [
-                    'always',
-                    'never',
-                ],
-            },
+            SCHEMA_BODY,
         ],
     },
 };

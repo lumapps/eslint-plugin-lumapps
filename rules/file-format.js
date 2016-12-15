@@ -1,5 +1,5 @@
 /**
- * @fileoverview enforce a specific file format
+ * @fileoverview Enforce a specific file format.
  * @author Clément P.
  */
 'use strict';
@@ -12,32 +12,27 @@
 // Helpers
 //------------------------------------------------------------------------------
 
-const DEFAULTS = {
-    ignorePrivateFormat: false,
-    ignorePrivatePattern: null,
-};
-
 const COMMENTS_REGEXP = /^\s*(([/]{2,}\s*.*)|([/]+[*]+\s*.*\s*[*]+[/]+)|([/][*]+)|([*]+\s*[^/]*)|[*]+[/])\s*$/;
 
 const FIRST_LINE = '(function IIFE() {';
 const FIRST_LINE_REGEXP = /^\s*\(function IIFE\(\) \{\s*$/;
-const FIRST_LINE_MESSAGE = 'First line of the file must be the IIFE function';
+const FIRST_LINE_MESSAGE = 'First line of the file must be the IIFE function.';
 
-const EMPTY_LINE_MESSAGE = 'The file must end with an empty line';
+const EMPTY_LINE_MESSAGE = 'The file must end with an empty line.';
 
 const LAST_LINE = '})();';
 const LAST_LINE_REGEXP = /^\s*\}\)\(\);\s*$/;
-const LAST_LINE_MESSAGE = 'Last line (before the empty one) must be the call of the IIFE';
+const LAST_LINE_MESSAGE = 'Last line (before the empty one) must be the call of the IIFE.';
 
 const USE_STRICT = "'use strict';";
 const USE_STRICT_REGEXP = /^\s*'use strict';\s*$/;
-const MISSING_STRICT_MESSAGE = `Expected ${USE_STRICT} to be the first statement of the IIFE`;
+const MISSING_STRICT_MESSAGE = `Expected ${USE_STRICT} to be the first statement of the IIFE.`;
 
 const SEPARATOR = '/////////////////////////////';
 const EMPTY_SEPARATOR = '//                         //';
 const SEPARATOR_REGEXP = /^\s*\/{29}\s*$/;
 const EMPTY_SEPARATOR_REGEXP = /^\s*\/\/\s{25}\/\/\s*$/;
-const MISSING_SEPARATOR_MESSAGE = `Expected a separator after the ${USE_STRICT} statement`;
+const MISSING_SEPARATOR_MESSAGE = `Expected a separator after the ${USE_STRICT} statement.`;
 
 const SEPARATORS = {
     EVENTS: /^\s*\/\/          Events         \/\/\s*$/,
@@ -55,20 +50,21 @@ const SEPARATORS_REGEXP = {
     PUBLIC_FUNCTIONS: /^\s*\/\/\s*Public functions\s*\/\/\s*$/,
     WATCHERS: /^\s*\/\/\s*Watchers\s*\/\/\s*$/,
 };
-const SEPARATOR_FORMAT_MESSAGE = 'Stub separator is not at the right format';
+const SEPARATOR_FORMAT_MESSAGE = 'Stub separator is not at the right format.';
 
 const MISSING_STUB_SEPARATOR_MESSAGE = {
-    EVENTS: 'Expected to see the events stub separator',
-    PRIVATE_ATTRIBUTES: 'Expected to see the private attributes stub separator',
-    PRIVATE_FUNCTIONS: 'Expected to see the private functions stub separator',
-    PUBLIC_ATTRIBUTES: 'Expected to see the public attributes stub separator',
-    PUBLIC_FUNCTIONS: 'Expected to see the public functions stub separator',
-    WATCHERS: 'Expected to see the watchers stub separator',
+    EVENTS: 'Expected to see the events stub separator.',
+    PRIVATE_ATTRIBUTES: 'Expected to see the private attributes stub separator.',
+    PRIVATE_FUNCTIONS: 'Expected to see the private functions stub separator.',
+    PUBLIC_ATTRIBUTES: 'Expected to see the public attributes stub separator.',
+    PUBLIC_FUNCTIONS: 'Expected to see the public functions stub separator.',
+    WATCHERS: 'Expected to see the watchers stub separator.',
 };
-const PRIVATE_VARIABLE_PREFIXED = 'Expected private variable to be prefixed by "_"';
+const PRIVATE_VARIABLE_PREFIXED = 'Expected private variable to be prefixed by "_".';
 
 /*
- * Base schema body.
+ * Base schema body for defining if we want to ignore the private variable format and a pattern of allowed private
+ * variables that doesn't match the format.
  * This can be used in a few different ways in the actual schema.
  *
  * @type {Object}
@@ -86,10 +82,13 @@ const SCHEMA_BODY = {
     type: 'object',
 };
 
+const DEFAULTS = {
+    ignorePrivateFormat: false,
+    ignorePrivatePattern: null,
+};
+
 /**
- * Get normalized options for either block or line comments from the given user-provided options.
- *     - If the user-provided options is just a string, returns a normalized set of options using default values for all
- *       other options.
+ * Get normalized options for from the given user-provided options.
  *     - If the user-provided options is an object, then a normalized option set is returned. Options specified in
  *       overrides will take priority over options specified in the main options object, which will in turn take
  *       priority over the rule's defaults.
@@ -386,8 +385,8 @@ module.exports = {
 
     meta: {
         docs: {
-            category: 'Best Practices',
-            description: 'enforce a specific file format',
+            category: 'Stylistic Issues',
+            description: 'Enforce a specific file format.',
             recommended: false,
         },
         fixable: null,

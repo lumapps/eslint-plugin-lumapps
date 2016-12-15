@@ -1,5 +1,5 @@
 /**
- * @fileoverview enforce parentheses around ternary's conditions
+ * @fileoverview Enforce parentheses around ternary's conditions.
  * @author Clément P.
  */
 'use strict';
@@ -11,6 +11,18 @@
 //------------------------------------------------------------------------------
 // Helpers
 //------------------------------------------------------------------------------
+
+/*
+ * Base schema body for defining the property "always"/"never" of the rule.
+ *
+ * @type {Object}
+ */
+const SCHEMA_BODY = {
+    'enum': [
+        'always',
+        'never',
+    ],
+};
 
 //------------------------------------------------------------------------------
 // Rule Definition
@@ -66,17 +78,12 @@ module.exports = {
     meta: {
         docs: {
             category: 'Stylistic Issues',
-            description: 'enforce ternary\'s condition parentheses surrounding',
+            description: 'Enforce ternary\'s condition parentheses surrounding.',
             recommended: false,
         },
         fixable: 'code',
         schema: [
-            {
-                'enum': [
-                    'always',
-                    'never',
-                ],
-            },
+            SCHEMA_BODY,
         ],
     },
 };
