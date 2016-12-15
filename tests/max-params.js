@@ -9,7 +9,7 @@
 // Requirements
 //------------------------------------------------------------------------------
 
-const rule = require('../rules/angular-max-params');
+const rule = require('../rules/max-params');
 const RuleTester = require('eslint').RuleTester;
 
 
@@ -27,7 +27,7 @@ const MESSAGE = {
 //------------------------------------------------------------------------------
 
 const ruleTester = new RuleTester();
-ruleTester.run('angular-max-params', rule, {
+ruleTester.run('max-params', rule, {
     invalid: [
         {
             code: 'function toto1(a, b, c, d) {}',
