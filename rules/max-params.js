@@ -100,10 +100,13 @@ module.exports = {
             if (node.params.length > normalizedOptions.maximum) {
                 if (normalizedOptions.ignoreAngularDI) {
                     const comments = sourceCode.getComments(node);
-                    const comment = ((((comments || {}).leading || [])[0] || {}).value || '')
-                        .toLowerCase().trim();
-                    if (comment === '@nginject') {
-                        return;
+                    for (let i = 0, len = ((comments || {}).leading || []).length; i < len; i++) {
+                        const commentBlock = ((comments || {}).leading || [])[i] || {};
+
+                        if (commentBlock.type === 'Block' &&
+                            (commentBlock.value || '').toLowerCase().trim() === '@nginject') {
+                            return;
+                        }
                     }
 
                     const parentCallName = (((node.parent || {}).callee || {}).name || '')
