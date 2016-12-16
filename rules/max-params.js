@@ -100,7 +100,7 @@ module.exports = {
             if (node.params.length > normalizedOptions.maximum) {
                 if (normalizedOptions.ignoreAngularDI) {
                     const comments = sourceCode.getComments(node);
-                    for (let i = 0, len = ((comments || {}).leading || []).length; i < len; i++) {
+                    for (let i = (((comments || {}).leading || []).length - 1); i >= 0; i--) {
                         const commentBlock = ((comments || {}).leading || [])[i] || {};
 
                         if (commentBlock.type === 'Block' &&
