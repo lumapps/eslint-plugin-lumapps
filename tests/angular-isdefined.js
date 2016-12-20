@@ -1,5 +1,6 @@
 /**
- * @fileoverview Enforce the usage of "angular.is[Un]defined[AndFilled|OrEmpty]" instead of "_.isEmpty".
+ * @fileoverview Enforce the usage of "angular.is[Un]defined[AndFilled|OrEmpty]" instead of "_.isEmpty" or length
+ *               checking..
  * @author Clément P.
  */
 'use strict';
@@ -8,7 +9,7 @@
 // Requirements
 //------------------------------------------------------------------------------
 
-const rule = require('../rules/underscore-isempty');
+const rule = require('../rules/angular-isdefined');
 const RuleTester = require('eslint').RuleTester;
 
 
@@ -25,7 +26,7 @@ const NEVER_MESSAGE = 'You should use "_.isEmpty" instead.';
 //------------------------------------------------------------------------------
 
 const ruleTester = new RuleTester();
-ruleTester.run('underscore-isempty', rule, {
+ruleTester.run('angular-isdefined', rule, {
     invalid: [
         {
             code: 'if (_.isEmpty(toto1)) { console.log(toto); }',
@@ -85,6 +86,7 @@ ruleTester.run('underscore-isempty', rule, {
     valid: [
         'if (angular.isDefinedAndFilled(toto1)) { console.log(toto); }',
         'toto.length = 0;',
+        'for (var i = 0, len = arr.length; i < len; i++) { console.log(i); }',
         {
             code: 'if (angular.isDefinedAndFilled(toto2)) { console.log(toto); }',
             options: ['always'],

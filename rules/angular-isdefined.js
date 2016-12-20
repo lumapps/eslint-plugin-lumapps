@@ -1,5 +1,6 @@
 /**
- * @fileoverview Enforce the usage of "angular.is[Un]defined[AndFilled|OrEmpty]" instead of "_.isEmpty".
+ * @fileoverview Enforce the usage of "angular.is[Un]defined[AndFilled|OrEmpty]" instead of "_.isEmpty" or length
+ *               checking.
  * @author Clément P.
  */
 'use strict';
@@ -66,7 +67,8 @@ module.exports = {
                                 checkIsUndefined = otherHand.value === 0;
                             }
                         } else {
-                            if (node.parent.operator === '=') {
+                            if (node.parent.type === 'AssignmentExpression' ||
+                                node.parent.type === 'VariableDeclarator') {
                                 return;
                             }
 
@@ -87,7 +89,8 @@ module.exports = {
     meta: {
         docs: {
             category: 'Best Practices',
-            description: 'Enforce the usage of "angular.is[Un]defined[AndFilled|OrEmpty]" instead of "_.isEmpty".',
+            description: 'Enforce the usage of "angular.is[Un]defined[AndFilled|OrEmpty]" instead of "_.isEmpty" or\
+                          length checking.',
             recommended: false,
         },
         fixable: null,
