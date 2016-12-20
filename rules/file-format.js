@@ -144,9 +144,11 @@ module.exports = {
                     data: `Expected "${FIRST_LINE}"`,
                     loc: {
                         end: {
+                            col: firstLine.length,
                             line: 1,
                         },
                         start: {
+                            col: 0,
                             line: 1,
                         },
                     },
@@ -164,9 +166,11 @@ module.exports = {
                         data: `Expected "${LAST_LINE}"`,
                         loc: {
                             end: {
+                                col: lastTextLine.length,
                                 line: lines.length - 1,
                             },
                             start: {
+                                col: 0,
                                 line: lines.length - 1,
                             },
                         },
@@ -180,9 +184,11 @@ module.exports = {
                     data: `Expected an empty line`,
                     loc: {
                         end: {
+                            col: lastLine.length,
                             line: lines.length,
                         },
                         start: {
+                            col: 0,
                             line: lines.length,
                         },
                     },
@@ -206,9 +212,11 @@ module.exports = {
                         data: `Expected "${USE_STRICT}"`,
                         loc: {
                             end: {
+                                col: line.length,
                                 line: i + 1,
                             },
                             start: {
+                                col: 0,
                                 line: i + 1,
                             },
                         },
@@ -246,14 +254,17 @@ module.exports = {
 
                 i++;
             }
+
             if (error) {
                 context.report({
                     data: `Expected "${SEPARATOR}"`,
                     loc: {
                         end: {
+                            col: line.length,
                             line: i + 1,
                         },
                         start: {
+                            col: 0,
                             line: i + 1,
                         },
                     },
@@ -306,10 +317,12 @@ module.exports = {
                                 data: `Expected "${expectedSeparator}" before and after`,
                                 loc: {
                                     end: {
-                                        line: k + 1,
+                                        col: lines[k + 2].length,
+                                        line: k + 3,
                                     },
                                     start: {
-                                        line: k + 1,
+                                        col: 8,
+                                        line: k - 1,
                                     },
                                 },
                                 message: SEPARATOR_FORMAT_MESSAGE,
@@ -335,10 +348,12 @@ module.exports = {
                                 context.report({
                                     loc: {
                                         end: {
+                                            col: line.length,
                                             line: k + 1,
                                         },
                                         start: {
-                                            line: k + 1,
+                                            col: 8,
+                                            line: k,
                                         },
                                     },
                                     message: MISSING_STUB_SEPARATOR_MESSAGE[regexpName],
@@ -362,9 +377,11 @@ module.exports = {
                         data: `Expected private variable to be prefixed by "_"`,
                         loc: {
                             end: {
+                                col: (line.indexOf('var') || line.indexOf('let')) + 3,
                                 line: k + 1,
                             },
                             start: {
+                                col: 8,
                                 line: k + 1,
                             },
                         },

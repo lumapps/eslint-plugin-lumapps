@@ -50,9 +50,9 @@ ruleTester.run('file-format', rule, {
         }, {
             code: "(function IIFE() {\n    'use strict';\n        var _toto = 2;\n        console.log(_toto);\n})\n",
             errors: [{
-                message: MISSING_SEPARATOR_MESSAGE,
-            }, {
                 message: MISSING_STUB_SEPARATOR_MESSAGE.PRIVATE_ATTRIBUTES,
+            }, {
+                message: MISSING_SEPARATOR_MESSAGE,
             }, {
                 message: LAST_LINE_MESSAGE,
             }],
