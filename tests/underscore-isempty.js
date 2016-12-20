@@ -84,6 +84,7 @@ ruleTester.run('underscore-isempty', rule, {
 
     valid: [
         'if (angular.isDefinedAndFilled(toto1)) { console.log(toto); }',
+        'toto.length = 0;',
         {
             code: 'if (angular.isDefinedAndFilled(toto2)) { console.log(toto); }',
             options: ['always'],

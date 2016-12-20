@@ -58,7 +58,7 @@ module.exports = {
                         if (node.parent.type === 'BinaryExpression') {
                             const otherHand = (node.parent.left === node) ? node.parent.right : node.parent.left;
 
-                            if (otherHand.value !== 0) {
+                            if (otherHand.value !== 0 || node.parent.operator === '=') {
                                 return;
                             }
 
@@ -66,6 +66,10 @@ module.exports = {
                                 checkIsUndefined = otherHand.value === 0;
                             }
                         } else {
+                            if (node.parent.operator === '=') {
+                                return;
+                            }
+
                             checkIsUndefined = false;
                         }
                     }
