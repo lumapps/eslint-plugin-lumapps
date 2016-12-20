@@ -70,6 +70,9 @@ ruleTester.run('angular-foreach', rule, {
     ],
 
     valid: [
+        'for (var i = 1; i < 1; i++) { console.log(i, arr.length); }',
+        'var len = 1; for (var i = 1; i < len; i++) { console.log(i, arr.length); }',
+        'for (var i = 1; i < 1; i++) { console.log(i); if (i === 1) { break; } }',
         'for (var i = 1; i < 1; i++) { console.log(i); if (i === 1) { break; } }',
         'angular.forEach([0], function forEach(i) { console.log(i); });',
         'for (var i = 1; i < arr.length; i++) { console.log(i); if (i === 1) { break; } }',

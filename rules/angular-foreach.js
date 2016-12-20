@@ -127,8 +127,9 @@ module.exports = {
                 const hasControlledFlowInside = hasControlledFlow(node);
 
                 if (angularForEach && !hasControlledFlowInside) {
-                    let sourceCodeText = sourceCode.getText(node);
-                    if (sourceCodeText.indexOf('.length') > -1) {
+                    let initSource = sourceCode.getText(node.init);
+                    let testSource = sourceCode.getText(node.test);
+                    if (initSource.indexOf('.length') > -1 || testSource.indexOf('.length') > -1) {
                         reportError(node, true);
                     }
                 }
