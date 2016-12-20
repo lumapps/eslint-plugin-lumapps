@@ -80,6 +80,12 @@ ruleTester.run('angular-isdefined', rule, {
                 message: ALWAYS_UNDEFINED_MESSAGE,
             }],
             options: ['always'],
+        }, {
+            code: 'if (angular.isDefined(toto)) { console.log(toto); } else if (toto2.length) { console.log(toto2); }',
+            errors: [{
+                message: ALWAYS_DEFINED_MESSAGE,
+            }],
+            options: ['always'],
         },
     ],
 

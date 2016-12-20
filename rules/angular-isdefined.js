@@ -67,9 +67,7 @@ module.exports = {
                                 checkIsUndefined = otherHand.value === 0;
                             }
                         } else {
-                            if (node.parent.type === 'AssignmentExpression' ||
-                                node.parent.type === 'CallExpression' ||
-                                node.parent.type === 'VariableDeclarator') {
+                            if (node.parent.type !== 'IfStatement') {
                                 return;
                             }
 
