@@ -87,6 +87,7 @@ ruleTester.run('angular-isdefined', rule, {
         'if (angular.isDefinedAndFilled(toto1)) { console.log(toto); }',
         'toto.length = 0;',
         'for (var i = 0, len = arr.length; i < len; i++) { console.log(i); }',
+        'toto(arr.length)',
         {
             code: 'if (angular.isDefinedAndFilled(toto2)) { console.log(toto); }',
             options: ['always'],

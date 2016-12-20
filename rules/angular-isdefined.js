@@ -68,6 +68,7 @@ module.exports = {
                             }
                         } else {
                             if (node.parent.type === 'AssignmentExpression' ||
+                                node.parent.type === 'CallExpression' ||
                                 node.parent.type === 'VariableDeclarator') {
                                 return;
                             }
