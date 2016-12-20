@@ -128,6 +128,10 @@ module.exports = {
             let firstLine = lines[lineIndex];
             while ((COMMENTS_REGEXP.test(firstLine) || firstLine === undefined || firstLine.length === 0) &&
                 lineIndex < lines.length) {
+                if (firstLine.indexOf('eslint-disable') > -1 && firstLine.indexOf('lumapps/file-format') > -1) {
+                    return;
+                }
+
                 lineIndex++;
                 firstLine = lines[lineIndex];
             }
