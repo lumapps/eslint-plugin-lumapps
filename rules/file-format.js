@@ -144,11 +144,11 @@ module.exports = {
                     data: `Expected "${FIRST_LINE}"`,
                     loc: {
                         end: {
-                            col: firstLine.length,
+                            column: firstLine.length,
                             line: 1,
                         },
                         start: {
-                            col: 0,
+                            column: 0,
                             line: 1,
                         },
                     },
@@ -166,11 +166,11 @@ module.exports = {
                         data: `Expected "${LAST_LINE}"`,
                         loc: {
                             end: {
-                                col: lastTextLine.length,
+                                column: lastTextLine.length,
                                 line: lines.length - 1,
                             },
                             start: {
-                                col: 0,
+                                column: 0,
                                 line: lines.length - 1,
                             },
                         },
@@ -184,11 +184,11 @@ module.exports = {
                     data: `Expected an empty line`,
                     loc: {
                         end: {
-                            col: lastLine.length,
+                            column: lastLine.length,
                             line: lines.length,
                         },
                         start: {
-                            col: 0,
+                            column: 0,
                             line: lines.length,
                         },
                     },
@@ -212,11 +212,11 @@ module.exports = {
                         data: `Expected "${USE_STRICT}"`,
                         loc: {
                             end: {
-                                col: line.length,
+                                column: line.length,
                                 line: i + 1,
                             },
                             start: {
-                                col: 0,
+                                column: 0,
                                 line: i + 1,
                             },
                         },
@@ -260,11 +260,11 @@ module.exports = {
                     data: `Expected "${SEPARATOR}"`,
                     loc: {
                         end: {
-                            col: line.length,
+                            column: line.length,
                             line: i + 1,
                         },
                         start: {
-                            col: 0,
+                            column: 0,
                             line: i + 1,
                         },
                     },
@@ -299,6 +299,8 @@ module.exports = {
                 WATCHERS: /^\s{8}\$(rootScope|scope)\.\$watch(Collection)?\(/,
             };
 
+            const publicFunctions = [];
+
             for (let k = lineIndex; k < len; k++) {
                 error = false;
                 line = lines[k];
@@ -317,11 +319,11 @@ module.exports = {
                                 data: `Expected "${expectedSeparator}" before and after`,
                                 loc: {
                                     end: {
-                                        col: lines[k + 2].length,
+                                        column: lines[k + 2].length,
                                         line: k + 3,
                                     },
                                     start: {
-                                        col: 8,
+                                        column: 8,
                                         line: k - 1,
                                     },
                                 },
@@ -340,20 +342,40 @@ module.exports = {
                         return;
                     }
 
-                    if (first[regexpName]) {
+                    if (first[regexpName] || regexpName === 'PUBLIC_FUNCTIONS') {
                         if (regexp[regexpName].test(line)) {
+                            let splitted = [];
+
+                            // Save all the checked public functions.
+                            if (regexpName === 'PUBLIC_FUNCTIONS') {
+                                splitted = line.split('(') || [];
+                                const functionName = (splitted[0] || '').replace('function ', '').replace(/\s/g, '');
+
+                                publicFunctions.push(functionName);
+                            }
+
+                            // Check if the supposed public attributes is in fact not the declaration of a public function.
+                            if (regexpName === 'PUBLIC_ATTRIBUTES') {
+                                splitted = line.split('=');
+                                const rightHandSide = splitted[splitted.length - 1].replace(';', '').replace(/\s/g, '');
+
+                                if (publicFunctions.indexOf(rightHandSide) > -1) {
+                                    return;
+                                }
+                            }
+
                             first[regexpName] = false;
 
                             if (!seen[regexpName]) {
                                 context.report({
                                     loc: {
                                         end: {
-                                            col: line.length,
-                                            line: k + 1,
+                                            column: line.length,
+                                            line: k + 2,
                                         },
                                         start: {
-                                            col: 8,
-                                            line: k,
+                                            column: 8,
+                                            line: k + 1,
                                         },
                                     },
                                     message: MISSING_STUB_SEPARATOR_MESSAGE[regexpName],
@@ -377,11 +399,11 @@ module.exports = {
                         data: `Expected private variable to be prefixed by "_"`,
                         loc: {
                             end: {
-                                col: (line.indexOf('var') || line.indexOf('let')) + 3,
+                                column: line.indexOf('=') - 1,
                                 line: k + 1,
                             },
                             start: {
-                                col: 8,
+                                column: (line.indexOf('var') || line.indexOf('let')) + 4,
                                 line: k + 1,
                             },
                         },
