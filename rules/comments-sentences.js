@@ -269,7 +269,7 @@ module.exports = {
 
             return (message !== undefined && message.length > 0) ? {
                 data: {
-                    col: col,
+                    column: col,
                     commentLine: lines[lineNumber],
                     line: lineNumber + 1,
                     more: more,
