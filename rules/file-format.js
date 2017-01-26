@@ -72,19 +72,35 @@ const PRIVATE_VARIABLE_PREFIXED = 'Expected private variable to be prefixed by "
 const SCHEMA_BODY = {
     additionalProperties: false,
     properties: {
+        ignoreEmptyLastLine: {
+            type: 'boolean',
+        },
+        ignoreIIFE: {
+            type: 'boolean',
+        },
         ignorePrivateFormat: {
             type: 'boolean',
         },
         ignorePrivatePattern: {
             type: 'string',
         },
+        ignoreStubSeparators: {
+            type: 'boolean',
+        },
+        ignoreUseStrict: {
+            type: 'boolean',
+        },
     },
     type: 'object',
 };
 
 const DEFAULTS = {
+    ignoreEmptyLastLine: false,
+    ignoreIIFE: false,
     ignorePrivateFormat: false,
     ignorePrivatePattern: null,
+    ignoreStubSeparators: false,
+    ignoreUseStrict: false,
 };
 
 /**
@@ -139,7 +155,8 @@ module.exports = {
                 return;
             }
 
-            if (!FIRST_LINE_REGEXP.test(firstLine)) {
+            if (context.parserOptions.sourceType === 'script' && !normalizedOptions.ignoreIIFE &&
+                !FIRST_LINE_REGEXP.test(firstLine)) {
                 context.report({
                     data: `Expected "${FIRST_LINE}"`,
                     loc: {
@@ -161,7 +178,8 @@ module.exports = {
             let lastLine = lines[lines.length - 1];
             if (lastLine.length === 0) {
                 let lastTextLine = lines[lines.length - 2];
-                if (!LAST_LINE_REGEXP.test(lastTextLine)) {
+                if (context.parserOptions.sourceType === 'script' && !normalizedOptions.ignoreIIFE &&
+                    !LAST_LINE_REGEXP.test(lastTextLine)) {
                     context.report({
                         data: `Expected "${LAST_LINE}"`,
                         loc: {
@@ -179,7 +197,7 @@ module.exports = {
                         node: null,
                     });
                 }
-            } else {
+            } else if (!normalizedOptions.ignoreEmptyLastLine) {
                 context.report({
                     data: `Expected an empty line`,
                     loc: {
@@ -199,17 +217,67 @@ module.exports = {
             }
 
             let line;
-            let i = lineIndex;
             let len = lines.length;
-            for (i = (lineIndex + 1); i < len; i++) {
-                line = lines[i];
-                if ((COMMENTS_REGEXP.test(line) || line === undefined || line.length === 0)) {
-                    continue;
+            let error = false;
+            if (context.parserOptions.sourceType === 'script' && !normalizedOptions.ignoreUseStrict) {
+                let i = lineIndex;
+                for (i = (lineIndex + 1); i < len; i++) {
+                    line = lines[i];
+                    if ((COMMENTS_REGEXP.test(line) || line === undefined || line.length === 0)) {
+                        continue;
+                    }
+
+                    if (!USE_STRICT_REGEXP.test(line)) {
+                        context.report({
+                            data: `Expected "${USE_STRICT}"`,
+                            loc: {
+                                end: {
+                                    column: line.length,
+                                    line: i + 1,
+                                },
+                                start: {
+                                    column: 0,
+                                    line: i + 1,
+                                },
+                            },
+                            message: MISSING_STRICT_MESSAGE,
+
+                            node: null,
+                        });
+
+                        return;
+                    }
+
+                    break;
                 }
 
-                if (!USE_STRICT_REGEXP.test(line)) {
+                i++;
+
+                let j = 0;
+                for (j = 0; j < len; j++) {
+                    line = lines[i];
+                    if ((COMMENTS_REGEXP.test(line) || line === undefined || line.length === 0)) {
+                        continue;
+                    }
+
+                    if ((j === 0 || j === 2) && line.length !== 0) {
+                        error = true;
+                        break;
+                    } else if (j === 1 && !SEPARATOR_REGEXP.test(line)) {
+                        error = true;
+                        break;
+                    }
+
+                    if (j > 2) {
+                        break;
+                    }
+
+                    i++;
+                }
+
+                if (error) {
                     context.report({
-                        data: `Expected "${USE_STRICT}"`,
+                        data: `Expected "${SEPARATOR}"`,
                         loc: {
                             end: {
                                 column: line.length,
@@ -220,58 +288,11 @@ module.exports = {
                                 line: i + 1,
                             },
                         },
-                        message: MISSING_STRICT_MESSAGE,
+                        message: MISSING_SEPARATOR_MESSAGE,
 
                         node: null,
                     });
-
-                    return;
                 }
-
-                break;
-            }
-
-            i++;
-            let j = 0;
-            let error = false;
-            for (j = 0; j < len; j++) {
-                line = lines[i];
-                if ((COMMENTS_REGEXP.test(line) || line === undefined || line.length === 0)) {
-                    continue;
-                }
-
-                if ((j === 0 || j === 2) && line.length !== 0) {
-                    error = true;
-                    break;
-                } else if (j === 1 && !SEPARATOR_REGEXP.test(line)) {
-                    error = true;
-                    break;
-                }
-
-                if (j > 2) {
-                    break;
-                }
-
-                i++;
-            }
-
-            if (error) {
-                context.report({
-                    data: `Expected "${SEPARATOR}"`,
-                    loc: {
-                        end: {
-                            column: line.length,
-                            line: i + 1,
-                        },
-                        start: {
-                            column: 0,
-                            line: i + 1,
-                        },
-                    },
-                    message: MISSING_SEPARATOR_MESSAGE,
-
-                    node: null,
-                });
             }
 
             let seen = {
@@ -305,112 +326,119 @@ module.exports = {
                 error = false;
                 line = lines[k];
 
-                // eslint-disable-next-line no-loop-func
-                Object.keys(regexp).forEach(function forEachRegexp(regexpName) {
-                    if (!seen[regexpName] && SEPARATORS_REGEXP[regexpName].test(line)) {
-                        if (!SEPARATORS[regexpName].test(line) ||
-                            !SEPARATOR_REGEXP.test(lines[k - 2]) || !EMPTY_SEPARATOR_REGEXP.test(lines[k - 1]) ||
-                            !SEPARATOR_REGEXP.test(lines[k + 2]) || !EMPTY_SEPARATOR_REGEXP.test(lines[k + 1])) {
-                            error = true;
+                if (!normalizedOptions.ignoreStubSeparators) {
+                    // eslint-disable-next-line no-loop-func
+                    Object.keys(regexp).forEach(function forEachRegexp(regexpName) {
+                        if (!seen[regexpName] && SEPARATORS_REGEXP[regexpName].test(line)) {
+                            if (!SEPARATORS[regexpName].test(line) ||
+                                !SEPARATOR_REGEXP.test(lines[k - 2]) || !EMPTY_SEPARATOR_REGEXP.test(lines[k - 1]) ||
+                                !SEPARATOR_REGEXP.test(lines[k + 2]) || !EMPTY_SEPARATOR_REGEXP.test(lines[k + 1])) {
+                                error = true;
 
-                            let expectedSeparator =
-                                `${SEPARATOR}\n${EMPTY_SEPARATOR}\n${line.trim()}\n${EMPTY_SEPARATOR}${SEPARATOR}\n`;
-                            context.report({
-                                data: `Expected "${expectedSeparator}" before and after`,
-                                loc: {
-                                    end: {
-                                        column: lines[k + 2].length,
-                                        line: k + 3,
-                                    },
-                                    start: {
-                                        column: 8,
-                                        line: k - 1,
-                                    },
-                                },
-                                message: SEPARATOR_FORMAT_MESSAGE,
+                                const trim = line.trim();
+                                let expectedSeparator =
+                                    `${SEPARATOR}\n${EMPTY_SEPARATOR}\n${trim}\n${EMPTY_SEPARATOR}${SEPARATOR}\n`;
 
-                                node: null,
-                            });
-                        }
-
-                        if (!error) {
-                            seen[regexpName] = true;
-
-                            k += 3;
-                        }
-
-                        return;
-                    }
-
-                    if (first[regexpName] || regexpName === 'PUBLIC_FUNCTIONS') {
-                        if (regexp[regexpName].test(line)) {
-                            let splitted = [];
-
-                            // Save all the checked public functions.
-                            if (regexpName === 'PUBLIC_FUNCTIONS') {
-                                splitted = line.split('(') || [];
-                                const functionName = (splitted[0] || '').replace('function ', '').replace(/\s/g, '');
-
-                                publicFunctions.push(functionName);
-                            }
-
-                            // Check if the supposed public attributes is in fact not the declaration of a public function.
-                            if (regexpName === 'PUBLIC_ATTRIBUTES') {
-                                splitted = line.split('=');
-                                const rightHandSide = splitted[splitted.length - 1].replace(';', '').replace(/\s/g, '');
-
-                                if (publicFunctions.indexOf(rightHandSide) > -1) {
-                                    return;
-                                }
-                            }
-
-                            first[regexpName] = false;
-
-                            if (!seen[regexpName]) {
                                 context.report({
+                                    data: `Expected "${expectedSeparator}" before and after`,
                                     loc: {
                                         end: {
-                                            column: line.length,
-                                            line: k + 2,
+                                            column: lines[k + 2].length,
+                                            line: k + 3,
                                         },
                                         start: {
                                             column: 8,
-                                            line: k + 1,
+                                            line: k - 1,
                                         },
                                     },
-                                    message: MISSING_STUB_SEPARATOR_MESSAGE[regexpName],
+                                    message: SEPARATOR_FORMAT_MESSAGE,
 
                                     node: null,
                                 });
                             }
-                        }
-                    }
-                });
 
-                if (normalizedOptions.ignorePrivateFormat === true) {
-                    continue;
+                            if (!error) {
+                                seen[regexpName] = true;
+
+                                k += 3;
+                            }
+
+                            return;
+                        }
+
+                        if (first[regexpName] || regexpName === 'PUBLIC_FUNCTIONS') {
+                            if (regexp[regexpName].test(line)) {
+                                let splitted = [];
+
+                                // Save all the checked public functions.
+                                if (regexpName === 'PUBLIC_FUNCTIONS') {
+                                    splitted = line.split('(') || [];
+                                    const functionName =
+                                        (splitted[0] || '').replace('function ', '').replace(/\s/g, '');
+
+                                    publicFunctions.push(functionName);
+                                }
+
+                                /*
+                                 * Check if the supposed public attributes is in fact not the declaration of a public
+                                 * function.
+                                 */
+                                if (regexpName === 'PUBLIC_ATTRIBUTES') {
+                                    splitted = line.split('=');
+                                    const rightHandSide =
+                                        splitted[splitted.length - 1].replace(';', '').replace(/\s/g, '');
+
+                                    if (publicFunctions.indexOf(rightHandSide) > -1) {
+                                        return;
+                                    }
+                                }
+
+                                first[regexpName] = false;
+
+                                if (!seen[regexpName]) {
+                                    context.report({
+                                        loc: {
+                                            end: {
+                                                column: line.length,
+                                                line: k + 2,
+                                            },
+                                            start: {
+                                                column: 8,
+                                                line: k + 1,
+                                            },
+                                        },
+                                        message: MISSING_STUB_SEPARATOR_MESSAGE[regexpName],
+
+                                        node: null,
+                                    });
+                                }
+                            }
+                        }
+                    });
                 }
 
-                if ((/^\s{8}(var|let) [a-z][^ ]* = /).test(line) &&
-                    (normalizedOptions.ignorePrivatePattern === undefined ||
-                    normalizedOptions.ignorePrivatePattern === null ||
-                    !RegExp(normalizedOptions.ignorePrivatePattern).test(line))) {
-                    context.report({
-                        data: `Expected private variable to be prefixed by "_"`,
-                        loc: {
-                            end: {
-                                column: line.indexOf('=') - 1,
-                                line: k + 1,
+                if (!normalizedOptions.ignorePrivateFormat) {
+                    if ((/^\s{8}(var|let) [a-z][^ ]* = /).test(line) &&
+                        (normalizedOptions.ignorePrivatePattern === undefined ||
+                        normalizedOptions.ignorePrivatePattern === null ||
+                        !RegExp(normalizedOptions.ignorePrivatePattern).test(line))) {
+                        context.report({
+                            data: `Expected private variable to be prefixed by "_"`,
+                            loc: {
+                                end: {
+                                    column: line.indexOf('=') - 1,
+                                    line: k + 1,
+                                },
+                                start: {
+                                    column: (line.indexOf('var') || line.indexOf('let')) + 4,
+                                    line: k + 1,
+                                },
                             },
-                            start: {
-                                column: (line.indexOf('var') || line.indexOf('let')) + 4,
-                                line: k + 1,
-                            },
-                        },
-                        message: PRIVATE_VARIABLE_PREFIXED,
+                            message: PRIVATE_VARIABLE_PREFIXED,
 
-                        node: null,
-                    });
+                            node: null,
+                        });
+                    }
                 }
             }
         }
