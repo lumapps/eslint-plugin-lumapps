@@ -21,7 +21,7 @@
     "test:single": "mocha"
   },
   "peerDependencies": {
-    "eslint": "latest"
+    "eslint": ">= 3.19.0"
   },
   "devDependencies": {
     "eslint": "latest",
