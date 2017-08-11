@@ -258,21 +258,18 @@ module.exports = {
                 i++;
 
                 let j = 0;
-                for (j = 0; j < len; j++) {
+                for (j = 0; j < 2; j++) {
                     line = lines[i];
-                    if ((COMMENTS_REGEXP.test(line) || line === undefined || line.length === 0)) {
-                        continue;
+
+                    if (LAST_LINE_REGEXP.test(line) || i === (len - 1)) {
+                        break;
                     }
 
-                    if ((j === 0 || j === 2) && line.length !== 0) {
+                    if (j === 0 && line.trim().length !== 0) {
                         error = true;
                         break;
                     } else if (j === 1 && !SEPARATOR_REGEXP.test(line)) {
                         error = true;
-                        break;
-                    }
-
-                    if (j > 2) {
                         break;
                     }
 
