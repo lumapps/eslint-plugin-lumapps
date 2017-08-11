@@ -159,7 +159,7 @@ module.exports = {
                 const isOptionalParam = line.indexOf('[') !== -1;
                 const endOfName = (isOptionalParam) ? line.indexOf(']') : line.indexOf(' ');
                 if ((isOptionalParam && endOfName <= 1) ||
-                    (!isOptionalParam && ((/^[A-Z]/).test(line) || line.indexOf(']') !== -1))) {
+                    (!isOptionalParam && line.indexOf(']') !== -1)) {
                     message = NAME_BADLY_FORMATTED;
                     lineNumber = i;
                     col = lines[i].length - line.length;
