@@ -141,6 +141,26 @@ ruleTester.run('comments-sentences', rule, {
             errors: [{
                 message: UPPERCASE_ERROR_MESSAGE,
             }],
+        }, {
+            code: '// @description This is a invalid comment',
+            errors: [{
+                message: PUNCTUATION_ERROR_MESSAGE,
+            }],
+        }, {
+            code: '// @param {string} toto This is a invalid comment',
+            errors: [{
+                message: PUNCTUATION_ERROR_MESSAGE,
+            }],
+        }, {
+            code: '// @return {string} This is a invalid comment',
+            errors: [{
+                message: PUNCTUATION_ERROR_MESSAGE,
+            }],
+        }, {
+            code: '// @throw {Error} This is a invalid comment',
+            errors: [{
+                message: PUNCTUATION_ERROR_MESSAGE,
+            }],
         },
     ],
 
@@ -153,8 +173,12 @@ ruleTester.run('comments-sentences', rule, {
         '// This is a valid comment.',
         '// 29 is a valid comment.',
         '// @description This is a valid comment.',
-        '//@description This is a valid comment.',
-        '// @description This is a valid comment',
+        '// @param {string} toto This is a valid comment.',
+        '// @return {string} This is a valid comment.',
+        '// @throw {Error} This is a valid comment.',
+        '// @constant',
+        '// @readonly',
+        '// @type {string}',
         '// "This" is a valid comment.',
         '// \'This\' is a valid comment.',
         '// +42 is a valid comment.',
