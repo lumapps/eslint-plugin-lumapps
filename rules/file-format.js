@@ -317,7 +317,7 @@ module.exports = {
                 PRIVATE_ATTRIBUTES: /^\s{8}(var|let) _[a-z][^ ;]*( = [^;]+)?;?$/,
                 PRIVATE_FUNCTIONS: /^\s{8}function _[a-z][^(]*\([^)]*\)\s*{?/,
                 PUBLIC_ATTRIBUTES: /^\s{8}[a-z][^. ]*\.[a-z][^ ]* = [^;]+;?$/,
-                PUBLIC_FUNCTIONS: /^\s{8}function [a-z][^(]*\([^)]*\)\s*{?/,
+                PUBLIC_FUNCTIONS: /^\s{8}([a-z][^. ]*\.[a-z][^ ]* = )?function [a-z][^(]*\([^)]*\)\s*{?/,
                 WATCHERS: /^\s{8}\$(rootScope|scope)\.\$watch(Collection)?\(/,
             };
 
@@ -371,11 +371,18 @@ module.exports = {
                             if (regexp[regexpName].test(line)) {
                                 let splitted = [];
 
+                                let functionName;
                                 // Save all the checked public functions.
                                 if (regexpName === 'PUBLIC_FUNCTIONS') {
                                     splitted = line.split('(') || [];
-                                    const functionName =
-                                        (splitted[0] || '').replace('function ', '').replace(/\s/g, '');
+                                    if (splitted[0].indexOf('=') > -1) {
+                                        splitted = splitted[0].split(' =');
+                                        functionName = (splitted[0] || '').replace(/[a-z][^. ]*\./, '');
+                                    } else {
+                                        functionName = (splitted[0] || '').replace('function ', '');
+                                    }
+
+                                    functionName = functionName.replace(/\s/g, '');
 
                                     publicFunctions.push(functionName);
                                 }
@@ -396,7 +403,8 @@ module.exports = {
 
                                 first[regexpName] = false;
 
-                                if (!seen[regexpName]) {
+                                if (!seen[regexpName] &&
+                                    functionName !== 'init' && functionName !== 'setParentController') {
                                     context.report({
                                         loc: {
                                             end: {
