@@ -46,7 +46,7 @@ const DEFAULTS = {
     ignoreInlineComments: false,
     ignorePattern: null,
 };
-const DEFAULT_IGNORE_PATTERN = /^\s*(?:eslint|istanbul|jscs|jshint|globals?|exported|@.+)\b/;
+const DEFAULT_IGNORE_PATTERN = /^\s*((?:eslint|istanbul|jscs|jshint|globals?|exported)\b|@([^ ]+|.+\})$)/;
 
 /**
  * Get all the variables of the global scope and all child scopes of the current context.
