@@ -46,7 +46,7 @@ const DEFAULTS = {
     ignoreInlineComments: false,
     ignorePattern: null,
 };
-const DEFAULT_IGNORE_PATTERN = /^\s*((?:eslint|istanbul|jscs|jshint|globals?|exported)\b|@([^ ]+|.+\})$)/;
+const DEFAULT_IGNORE_PATTERN = /^\s*(\* )?((?:eslint|istanbul|jscs|jshint|globals?|exported)\b|@([^ ]+|.+\})\s*$)/;
 
 /**
  * Get all the variables of the global scope and all child scopes of the current context.
@@ -177,7 +177,7 @@ module.exports = {
                 isIgnored = true;
 
                 // 2.1. Check for default ignore pattern.
-                if (DEFAULT_IGNORE_PATTERN.test(line)) {
+                if (DEFAULT_IGNORE_PATTERN.test(line.trim())) {
                     continue;
                 }
 
