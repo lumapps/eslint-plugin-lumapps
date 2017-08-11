@@ -10,6 +10,7 @@ module.exports = {
         'angular-isdefined': require('./rules/angular-isdefined'),
         'comments-sentences': require('./rules/comments-sentences'),
         'file-format': require('./rules/file-format'),
+        'jsdoc-format': require('./rules/jsdoc-format'),
         'max-params': require('./rules/max-params'),
         'ternary-condition-parens': require('./rules/ternary-condition-parens'),
     },
