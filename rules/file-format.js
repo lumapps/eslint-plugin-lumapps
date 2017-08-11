@@ -155,7 +155,11 @@ module.exports = {
                 return;
             }
 
-            if (context.parserOptions.sourceType === 'script' && !normalizedOptions.ignoreIIFE &&
+            var parserOptions = (context.parserOptions) ? Object.assign({}, context.parserOptions) : {};
+            parserOptions.sourceType = parserOptions.sourceType || 'script';
+            parserOptions.ecmaVersion = parserOptions.ecmaVersion || 5;
+
+            if (parserOptions.sourceType === 'script' && !normalizedOptions.ignoreIIFE &&
                 !FIRST_LINE_REGEXP.test(firstLine)) {
                 context.report({
                     data: `Expected "${FIRST_LINE}"`,
@@ -178,7 +182,7 @@ module.exports = {
             let lastLine = lines[lines.length - 1];
             if (lastLine.length === 0) {
                 let lastTextLine = lines[lines.length - 2];
-                if (context.parserOptions.sourceType === 'script' && !normalizedOptions.ignoreIIFE &&
+                if (parserOptions.sourceType === 'script' && !normalizedOptions.ignoreIIFE &&
                     !LAST_LINE_REGEXP.test(lastTextLine)) {
                     context.report({
                         data: `Expected "${LAST_LINE}"`,
@@ -219,7 +223,7 @@ module.exports = {
             let line;
             let len = lines.length;
             let error = false;
-            if (context.parserOptions.sourceType === 'script' && !normalizedOptions.ignoreUseStrict) {
+            if (parserOptions.sourceType === 'script' && !normalizedOptions.ignoreUseStrict) {
                 let i = lineIndex;
                 for (i = (lineIndex + 1); i < len; i++) {
                     line = lines[i];
