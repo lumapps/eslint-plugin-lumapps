@@ -226,8 +226,10 @@ module.exports = {
                 const firstWord = (line.split(' ') || [''])[0];
                 const firstWordChar = line[0];
                 if (FIRST_LETTER_PATTERN.test(firstWordChar) && !variables[firstWord]) {
-                    // 2.6.1. Check that if the previous line ended with a punctuation or was ignored, the first letter is
-                    // uppercase.
+                    /*
+                     * 2.6.1. Check that if the previous line ended with a punctuation or was ignored, the first letter
+                     * is uppercase.
+                     */
                     if ((wasEndingByPunctuation || wasIgnored || wasEmpty) &&
                         firstWordChar !== firstWordChar.toLocaleUpperCase()) {
                         message = UPPERCASE_ERROR_MESSAGE;
@@ -235,8 +237,10 @@ module.exports = {
                         break;
                     }
 
-                    // 2.6.1. Check that if the previous line was not ending with a punctuation or was not ignored, the
-                    // first letter is lowercase.
+                    /*
+                     * 2.6.1. Check that if the previous line was not ending with a punctuation or was not ignored, the
+                     * first letter is lowercase.
+                     */
                     if (!wasEndingByPunctuation && !wasIgnored && !wasEmpty &&
                         firstWordChar !== firstWordChar.toLocaleLowerCase()) {
                         message = LOWERCASE_ERROR_MESSAGE;
