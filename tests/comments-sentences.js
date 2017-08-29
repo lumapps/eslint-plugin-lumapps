@@ -187,6 +187,8 @@ ruleTester.run('comments-sentences', rule, {
         '/* @readonly */',
         '// @type {string}',
         '/* @type {string} */',
+        '/* @see toto */',
+        '/* @see toto titi tata */',
         '// "This" is a valid comment.',
         '// \'This\' is a valid comment.',
         '// +42 is a valid comment.',
