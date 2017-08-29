@@ -9,7 +9,6 @@
 //------------------------------------------------------------------------------
 
 const FIRST_LETTER_PATTERN = require('eslint/lib/util/patterns/letters');
-const PUNCTUATION = /[!.?]\s*$/;
 
 //------------------------------------------------------------------------------
 // Helpers
@@ -181,8 +180,7 @@ module.exports = {
                 line = line.replace(/^\s*/, '');
                 const firstWordChar = line[0];
                 if ((!FIRST_LETTER_PATTERN.test(firstWordChar) && !(/[0-9]/).test(firstWordChar)) ||
-                    firstWordChar !== firstWordChar.toLocaleUpperCase() ||
-                    !PUNCTUATION.test(line)) {
+                    firstWordChar !== firstWordChar.toLocaleUpperCase()) {
                     message = DESCRIPTION_BADLY_FORMATTED;
                     lineNumber = i;
                     col = lines[i].length - line.length;

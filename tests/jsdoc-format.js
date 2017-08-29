@@ -125,11 +125,6 @@ ruleTester.run('jsdoc-format', rule, {
                 message: DESCRIPTION_BADLY_FORMATTED,
             }],
         }, {
-            code: '/**\n * @param {string} Description Of the param 2\n */',
-            errors: [{
-                message: DESCRIPTION_BADLY_FORMATTED,
-            }],
-        }, {
             code: '/**\n * @param {string} toto12 (Description Of the param 3).\n */',
             errors: [{
                 message: DESCRIPTION_BADLY_FORMATTED,
