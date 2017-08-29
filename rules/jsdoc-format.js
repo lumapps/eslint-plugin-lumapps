@@ -8,6 +8,9 @@
 // Requirements
 //------------------------------------------------------------------------------
 
+const FIRST_LETTER_PATTERN = require('eslint/lib/util/patterns/letters');
+const PUNCTUATION = /[!.?]\s*$/;
+
 //------------------------------------------------------------------------------
 // Helpers
 //------------------------------------------------------------------------------
@@ -21,6 +24,8 @@ const TYPE_BADLY_FORMATTED = 'Type is badly formatted';
 const PARAMS_NAME_ALIGNMENT_ERROR_MESSAGE = 'Params name should be aligned (with other param names and with return description).';
 const RETURN_DESCRIPTION_ALIGNMENT_ERROR_MESSAGE = 'Return description should be aligned with params names.';
 const NAME_BADLY_FORMATTED = "Name is missing, badly formatted or doesn't follow convention";
+// eslint-disable-next-line max-len
+const DESCRIPTION_BADLY_FORMATTED = "Description is missing, badly formatted or doesn't follow convention (e.g. missing starting upper case letter)";
 const PARAMS_DESCRIPTION_ALIGNMENT_ERROR_MESSAGE = 'Params description should be aligned.';
 
 /*
@@ -74,8 +79,6 @@ module.exports = {
             });
             const len = lines.length;
 
-            let numberOfParams = 0;
-
             let longuestType = 0;
             let longuestName = 0;
             lines.forEach(function forEachLines(line) {
@@ -83,8 +86,6 @@ module.exports = {
                 longuestType = (typeLength > longuestType) ? typeLength : longuestType;
 
                 if (line.indexOf('@param') > -1) {
-                    numberOfParams++;
-
                     line = line.substring(line.indexOf('}') + 1).replace(/^\s*/, '');
 
                     const nameLength = (line.indexOf('[') === 0) ? line.indexOf(']') + 1 : line.indexOf(' ');
@@ -158,17 +159,11 @@ module.exports = {
                 line = line.replace(/^\s*/, '');
                 const isOptionalParam = line.indexOf('[') !== -1;
                 const endOfName = (isOptionalParam) ? line.indexOf(']') : line.indexOf(' ');
-                if ((isOptionalParam && endOfName <= 1) ||
-                    (!isOptionalParam && line.indexOf(']') !== -1)) {
+                if ((isOptionalParam && endOfName <= 1) || (!isOptionalParam && line.indexOf(']') !== -1)) {
                     message = NAME_BADLY_FORMATTED;
                     lineNumber = i;
                     col = lines[i].length - line.length;
                     break;
-                }
-
-                // If there is only one params, there is no point to check for description alignement.
-                if (numberOfParams === 1) {
-                    continue;
                 }
 
                 // 7. Check the alignment of the descriptions.
@@ -177,6 +172,18 @@ module.exports = {
 
                 if ((endOfName + spacesBeforeDescription) !== longuestName) {
                     message = PARAMS_DESCRIPTION_ALIGNMENT_ERROR_MESSAGE;
+                    lineNumber = i;
+                    col = lines[i].length - line.length;
+                    break;
+                }
+
+                // 6. Check the format of the description.
+                line = line.replace(/^\s*/, '');
+                const firstWordChar = line[0];
+                if ((!FIRST_LETTER_PATTERN.test(firstWordChar) && !(/[0-9]/).test(firstWordChar)) ||
+                    firstWordChar !== firstWordChar.toLocaleUpperCase() ||
+                    !PUNCTUATION.test(line)) {
+                    message = DESCRIPTION_BADLY_FORMATTED;
                     lineNumber = i;
                     col = lines[i].length - line.length;
                     break;
