@@ -14,25 +14,25 @@
 
 const COMMENTS_REGEXP = /^\s*(([/]{2,}\s*.*)|([/]+[*]+\s*.*\s*[*]+[/]+)|([/][*]+)|([*]+\s*[^/]*)|[*]+[/])\s*$/;
 
-const FIRST_LINE = '(function IIFE() {';
+const FIRST_LINE = `(function IIFE() {`;
 const FIRST_LINE_REGEXP = /^\s*\(function IIFE\(\) \{\s*$/;
-const FIRST_LINE_MESSAGE = 'First line of the file must be the IIFE function.';
+const FIRST_LINE_MESSAGE = `First line of the file must be the IIFE function.`;
 
-const EMPTY_LINE_MESSAGE = 'The file must end with an empty line.';
+const EMPTY_LINE_MESSAGE = `The file must end with an empty line.`;
 
-const LAST_LINE = '})();';
+const LAST_LINE = `})();`;
 const LAST_LINE_REGEXP = /^\s*\}\)\(\);\s*$/;
-const LAST_LINE_MESSAGE = 'Last line (before the empty one) must be the call of the IIFE.';
+const LAST_LINE_MESSAGE = `Last line (before the empty one) must be the call of the IIFE.`;
 
-const USE_STRICT = "'use strict';";
+const USE_STRICT = `'use strict';`;
 const USE_STRICT_REGEXP = /^\s*'use strict';\s*$/;
-const MISSING_STRICT_MESSAGE = `Expected ${USE_STRICT} to be the first statement of the IIFE.`;
+const MISSING_STRICT_MESSAGE = `Expected "${USE_STRICT}" to be the first statement of the IIFE.`;
 
-const SEPARATOR = '/////////////////////////////';
-const EMPTY_SEPARATOR = '//                         //';
+const SEPARATOR = `/////////////////////////////`;
+const EMPTY_SEPARATOR = `//                         //`;
 const SEPARATOR_REGEXP = /^\s*\/{29}\s*$/;
 const EMPTY_SEPARATOR_REGEXP = /^\s*\/\/\s{25}\/\/\s*$/;
-const MISSING_SEPARATOR_MESSAGE = `Expected a separator after the ${USE_STRICT} statement.`;
+const MISSING_SEPARATOR_MESSAGE = `Expected a separator after the "${USE_STRICT}" statement.`;
 
 const SEPARATORS = {
     EVENTS: /^\s*\/\/          Events         \/\/\s*$/,
@@ -50,17 +50,17 @@ const SEPARATORS_REGEXP = {
     PUBLIC_FUNCTIONS: /^\s*\/\/\s*Public functions\s*\/\/\s*$/,
     WATCHERS: /^\s*\/\/\s*Watchers\s*\/\/\s*$/,
 };
-const SEPARATOR_FORMAT_MESSAGE = 'Stub separator is not at the right format.';
+const SEPARATOR_FORMAT_MESSAGE = `Stub separator is not at the right format.`;
 
 const MISSING_STUB_SEPARATOR_MESSAGE = {
-    EVENTS: 'Expected to see the events stub separator.',
-    PRIVATE_ATTRIBUTES: 'Expected to see the private attributes stub separator.',
-    PRIVATE_FUNCTIONS: 'Expected to see the private functions stub separator.',
-    PUBLIC_ATTRIBUTES: 'Expected to see the public attributes stub separator.',
-    PUBLIC_FUNCTIONS: 'Expected to see the public functions stub separator.',
-    WATCHERS: 'Expected to see the watchers stub separator.',
+    EVENTS: `Expected to see the events stub separator.`,
+    PRIVATE_ATTRIBUTES: `Expected to see the private attributes stub separator.`,
+    PRIVATE_FUNCTIONS: `Expected to see the private functions stub separator.`,
+    PUBLIC_ATTRIBUTES: `Expected to see the public attributes stub separator.`,
+    PUBLIC_FUNCTIONS: `Expected to see the public functions stub separator.`,
+    WATCHERS: `Expected to see the watchers stub separator.`,
 };
-const PRIVATE_VARIABLE_PREFIXED = 'Expected private variable to be prefixed by "_".';
+const PRIVATE_VARIABLE_PREFIXED = `Expected private variable to be prefixed by "_".`;
 
 /*
  * Base schema body for defining if we want to ignore the private variable format and a pattern of allowed private
@@ -98,7 +98,7 @@ const DEFAULTS = {
     ignoreEmptyLastLine: false,
     ignoreIIFE: false,
     ignorePrivateFormat: false,
-    ignorePrivatePattern: null,
+    ignorePrivatePattern: '\\s*(([^ ]+S|s)(ervice|vc)[^ ]*\\s*=\\s*{}|([^ ]+)\\s*=\\s*([{][}];|this;|.+Service.+))$',
     ignoreStubSeparators: false,
     ignoreUseStrict: false,
 };
@@ -384,6 +384,10 @@ module.exports = {
 
                                     functionName = functionName.replace(/\s/g, '');
 
+                                    if (!first[regexpName] && publicFunctions.indexOf(functionName) > -1) {
+                                        return;
+                                    }
+
                                     publicFunctions.push(functionName);
                                 }
 
@@ -398,6 +402,15 @@ module.exports = {
 
                                     if (publicFunctions.indexOf(rightHandSide) > -1) {
                                         return;
+                                    } else if (rightHandSide.indexOf('function') === 0) {
+                                        functionName = rightHandSide.replace('function', '').replace('(){', '');
+                                        publicFunctions.push(functionName);
+
+                                        regexpName = 'PUBLIC_FUNCTIONS';
+
+                                        if (!first[regexpName]) {
+                                            return;
+                                        }
                                     }
                                 }
 
