@@ -8,6 +8,8 @@
 // Requirements
 //------------------------------------------------------------------------------
 
+const dedent = require('dedent-js');
+
 const rule = require('../rules/file-format');
 const RuleTester = require('eslint').RuleTester;
 
@@ -16,21 +18,21 @@ const RuleTester = require('eslint').RuleTester;
 // Helpers
 //------------------------------------------------------------------------------
 
-const FIRST_LINE_MESSAGE = 'First line of the file must be the IIFE function.';
-const EMPTY_LINE_MESSAGE = 'The file must end with an empty line.';
-const LAST_LINE_MESSAGE = 'Last line (before the empty one) must be the call of the IIFE.';
-const MISSING_STRICT_MESSAGE = 'Expected \'use strict\'; to be the first statement of the IIFE.';
-const MISSING_SEPARATOR_MESSAGE = 'Expected a separator after the \'use strict\'; statement.';
-const SEPARATOR_FORMAT_MESSAGE = 'Stub separator is not at the right format.';
+const FIRST_LINE_MESSAGE = `First line of the file must be the IIFE function.`;
+const EMPTY_LINE_MESSAGE = `The file must end with an empty line.`;
+const LAST_LINE_MESSAGE = `Last line (before the empty one) must be the call of the IIFE.`;
+const MISSING_STRICT_MESSAGE = `Expected "'use strict';" to be the first statement of the IIFE.`;
+const MISSING_SEPARATOR_MESSAGE = `Expected a separator after the "'use strict';" statement.`;
+const SEPARATOR_FORMAT_MESSAGE = `Stub separator is not at the right format.`;
 const MISSING_STUB_SEPARATOR_MESSAGE = {
-    EVENTS: 'Expected to see the events stub separator.',
-    PRIVATE_ATTRIBUTES: 'Expected to see the private attributes stub separator.',
-    PRIVATE_FUNCTIONS: 'Expected to see the private functions stub separator.',
-    PUBLIC_ATTRIBUTES: 'Expected to see the public attributes stub separator.',
-    PUBLIC_FUNCTIONS: 'Expected to see the public functions stub separator.',
-    WATCHERS: 'Expected to see the watchers stub separator.',
+    EVENTS: `Expected to see the events stub separator.`,
+    PRIVATE_ATTRIBUTES: `Expected to see the private attributes stub separator.`,
+    PRIVATE_FUNCTIONS: `Expected to see the private functions stub separator.`,
+    PUBLIC_ATTRIBUTES: `Expected to see the public attributes stub separator.`,
+    PUBLIC_FUNCTIONS: `Expected to see the public functions stub separator.`,
+    WATCHERS: `Expected to see the watchers stub separator.`,
 };
-const PRIVATE_VARIABLE_PREFIXED = 'Expected private variable to be prefixed by "_".';
+const PRIVATE_VARIABLE_PREFIXED = `Expected private variable to be prefixed by "_".`;
 
 //------------------------------------------------------------------------------
 // Tests
@@ -40,7 +42,14 @@ const ruleTester = new RuleTester();
 ruleTester.run('file-format', rule, {
     invalid: [
         {
-            code: "'use strict';\nvar toto = 1;\nconsole.log(toto);\n",
+            code: dedent`
+
+            'use strict';
+            var toto = 1;
+            console.log(toto);
+
+            `,
+
             errors: [{
                 message: FIRST_LINE_MESSAGE,
             }, {
@@ -48,8 +57,22 @@ ruleTester.run('file-format', rule, {
             }, {
                 message: LAST_LINE_MESSAGE,
             }],
-        }, {
-            code: "(function IIFE() {\n    'use strict';\n        var _toto = 2;\n    console.log(_toto);\n})\n",
+        },
+
+        {
+            code: dedent`
+
+            (function IIFE() {
+                'use strict';
+
+                function TestFunction() {
+                    var _toto = 2;
+                    console.log(_toto);
+                }
+            })
+
+            `,
+
             errors: [{
                 message: MISSING_SEPARATOR_MESSAGE,
             }, {
@@ -57,117 +80,411 @@ ruleTester.run('file-format', rule, {
             }, {
                 message: LAST_LINE_MESSAGE,
             }],
-        }, {
-            // eslint-disable-next-line max-len
-            code: '(function IIFE() {\n\n    /////////////////////////////\n\n    var _toto = 3;\n    console.log(_toto);\n})();\n',
+        },
+
+        {
+            code: dedent`
+
+            (function IIFE() {
+
+                /////////////////////////////
+
+                function TestFunction() {
+                    var _toto = 3;
+                    console.log(_toto);
+                }
+            })();
+
+            `,
+
             errors: [{
                 message: MISSING_STRICT_MESSAGE,
             }],
-        }, {
-            // eslint-disable-next-line max-len
-            code: "(function IIFE() {\n    'use strict';\n    \n    /////////////////////////////\n    \n        var _toto = 4;\n    console.log(_toto);\n})();",
+        },
+
+        {
+            code: dedent`
+
+            (function IIFE() {
+                'use strict';
+
+                /////////////////////////////
+
+                function TestFunction() {
+                    var _toto = 4;
+                    console.log(_toto);
+                }
+            })();
+            `,
+
             errors: [{
                 message: MISSING_STUB_SEPARATOR_MESSAGE.PRIVATE_ATTRIBUTES,
             }, {
                 message: EMPTY_LINE_MESSAGE,
             }],
-        }, {
-            // eslint-disable-next-line max-len
-            code: "(function IIFE() {\n    'use strict';\n    \n    /////////////////////////////\n    \n        var _toto = 5;\n        \n    /////////////////////////////\n    //    Private functions    //\n    /////////////////////////////\n})();\n",
+        },
+
+        {
+            code: dedent`
+
+            (function IIFE() {
+                'use strict';
+
+                /////////////////////////////
+
+                function TestFunction() {
+                    var _toto = 5;
+
+                    /////////////////////////////
+                    //    Private functions    //
+                    /////////////////////////////
+                }
+            })();
+
+            `,
+
             errors: [{
                 message: MISSING_STUB_SEPARATOR_MESSAGE.PRIVATE_ATTRIBUTES,
             }, {
                 message: SEPARATOR_FORMAT_MESSAGE,
             }],
-        }, {
-            // eslint-disable-next-line max-len
-            code: "(function IIFE() {\n    'use strict';\n    \n    /////////////////////////////\n    //    Private functions    //\n    /////////////////////////////\n    \n        var _toto = 6;\n})();\n",
+        },
+
+        {
+            code: dedent`
+
+            (function IIFE() {
+                'use strict';
+
+                /////////////////////////////
+
+                function TestFunction() {
+
+                    /////////////////////////////
+                    //    Private functions    //
+                    /////////////////////////////
+
+                    var _toto = 6;
+                }
+            })();
+
+            `,
+
             errors: [{
                 message: SEPARATOR_FORMAT_MESSAGE,
             }, {
                 message: MISSING_STUB_SEPARATOR_MESSAGE.PRIVATE_ATTRIBUTES,
             }],
-        }, {
-            // eslint-disable-next-line max-len
-            code: "(function IIFE() {\n    'use strict';\n    \n    /////////////////////////////\n    \n    var vm = this;\n    \n        vm.toto = 7;\n    console.log(vm.toto);\n})();\n",
+        },
+
+        {
+            code: dedent`
+
+            (function IIFE() {
+                'use strict';
+
+                /////////////////////////////
+
+                function TestFunction() {
+                    var vm = this;
+
+                    vm.toto = 7;
+                    console.log(vm.toto);
+                }
+            })();
+
+            `,
+
             errors: [{
                 message: MISSING_STUB_SEPARATOR_MESSAGE.PUBLIC_ATTRIBUTES,
             }],
-            options: [{
-                ignorePrivatePattern: '\\s*(([^ ]+S|s)(ervice|vc)[^ ]*\\s*=\\s*{}|([^ ]+)\\s*=\\s*this);$',
-            }],
-        }, {
-            // eslint-disable-next-line max-len
-            code: "(function IIFE() {\n    'use strict';\n    \n    /////////////////////////////\n    \n        function _toto() { console.log('coucou 1'); }\n})();\n",
+        },
+
+        {
+            code: dedent`
+
+            (function IIFE() {
+                'use strict';
+
+                /////////////////////////////
+
+                function TestFunction() {
+                    function _toto() {
+                        console.log('coucou 1');
+                    }
+                }
+            })();
+
+            `,
+
             errors: [{
                 message: MISSING_STUB_SEPARATOR_MESSAGE.PRIVATE_FUNCTIONS,
             }],
-        }, {
-            // eslint-disable-next-line max-len
-            code: "(function IIFE() {\n    'use strict';\n    \n    /////////////////////////////\n    \n        function toto() { console.log('coucou 2'); }\n})();\n",
+        },
+
+        {
+            code: dedent`
+
+            (function IIFE() {
+                'use strict';
+
+                /////////////////////////////
+
+                function TestFunction() {
+                    function toto() {
+                        console.log('coucou 2');
+                    }
+                }
+            })();
+
+            `,
+
             errors: [{
                 message: MISSING_STUB_SEPARATOR_MESSAGE.PUBLIC_FUNCTIONS,
             }],
-        }, {
-            // eslint-disable-next-line max-len
-            code: "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n        vm.toto = function toto() { console.log('coucou 2'); };\n})();\n",
+        },
+
+        {
+            code: dedent`
+
+            (function IIFE() {
+                'use strict';
+
+                /////////////////////////////
+
+                function TestFunction() {
+                    vm.toto = function toto() {
+                        console.log('coucou 2');
+                    };
+                }
+            })();
+
+            `,
+
             errors: [{
                 message: MISSING_STUB_SEPARATOR_MESSAGE.PUBLIC_FUNCTIONS,
             }],
-        }, {
-            // eslint-disable-next-line max-len
-            code: "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n        this.toto = function toto() { console.log('coucou 2'); };\n})();\n",
+        },
+
+        {
+            code: dedent`
+
+            (function IIFE() {
+                'use strict';
+
+                /////////////////////////////
+
+                function TestFunction() {
+                    this.toto = function toto() {
+                        console.log('coucou 2');
+                    };
+                }
+            })();
+
+            `,
+
             errors: [{
                 message: MISSING_STUB_SEPARATOR_MESSAGE.PUBLIC_FUNCTIONS,
             }],
-        }, {
-            // eslint-disable-next-line max-len
-            code: "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n    function toto($scope) {\n        $scope.$on('toto', function() { console.log('toto'); });\n    }\n})();\n",
+        },
+
+        {
+            code: dedent`
+
+            (function IIFE() {
+                'use strict';
+
+                /////////////////////////////
+
+                function TestFunction($scope) {
+                    $scope.$on('toto', function() {
+                        console.log('toto');
+                    });
+                }
+            })();
+
+            `,
+
             errors: [{
                 message: MISSING_STUB_SEPARATOR_MESSAGE.EVENTS,
             }],
-        }, {
-            // eslint-disable-next-line max-len
-            code: "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n    function toto($rootScope) {\n        $rootScope.$on('toto', function() { console.log('toto'); });\n    }\n})();\n",
+        },
+
+        {
+            code: dedent`
+
+            (function IIFE() {
+                'use strict';
+
+                /////////////////////////////
+
+                function TestFunction($rootScope) {
+                    $rootScope.$on('toto', function() {
+                        console.log('toto');
+                    });
+                }
+            })();
+
+            `,
+
             errors: [{
                 message: MISSING_STUB_SEPARATOR_MESSAGE.EVENTS,
             }],
-        }, {
-            // eslint-disable-next-line max-len
-            code: "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n    function toto($scope) {\n        $scope.$watchCollection('toto', function() { console.log('toto'); });\n    }\n})();\n",
+        },
+
+        {
+            code: dedent`
+
+            (function IIFE() {
+                'use strict';
+
+                /////////////////////////////
+
+                function TestFunction($scope) {
+                    $scope.$watchCollection('toto', function() {
+                        console.log('toto');
+                    });
+                }
+            })();
+
+            `,
+
             errors: [{
                 message: MISSING_STUB_SEPARATOR_MESSAGE.WATCHERS,
             }],
-        }, {
-            // eslint-disable-next-line max-len
-            code: "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n    function toto($rootScope) {\n        $rootScope.$watchCollection('toto', function() { console.log('toto'); });\n    }\n})();\n",
+        },
+
+        {
+            code: dedent`
+
+            (function IIFE() {
+                'use strict';
+
+                /////////////////////////////
+
+                function TestFunction($rootScope) {
+                    $rootScope.$watchCollection('toto', function() {
+                        console.log('toto');
+                    });
+                }
+            })();
+
+            `,
+
             errors: [{
                 message: MISSING_STUB_SEPARATOR_MESSAGE.WATCHERS,
             }],
-        }, {
-            // eslint-disable-next-line max-len
-            code: "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n    function toto($scope) {\n        $scope.$watch('toto', function() { console.log('toto'); });\n    }\n})();\n",
+        },
+
+        {
+            code: dedent`
+
+            (function IIFE() {
+                'use strict';
+
+                /////////////////////////////
+
+                function TestFunction($scope) {
+                    $scope.$watch('toto', function() {
+                        console.log('toto');
+                    });
+                }
+            })();
+
+            `,
+
             errors: [{
                 message: MISSING_STUB_SEPARATOR_MESSAGE.WATCHERS,
             }],
-        }, {
-            // eslint-disable-next-line max-len
-            code: "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n    function toto($rootScope) {\n        $rootScope.$watch('toto', function() { console.log('toto'); });\n    }\n})();\n",
+        },
+
+        {
+            code: dedent`
+
+            (function IIFE() {
+                'use strict';
+
+                /////////////////////////////
+
+                function TestFunction($rootScope) {
+                    $rootScope.$watch('toto', function() {
+                        console.log('toto');
+                    });
+                }
+            })();
+
+            `,
+
             errors: [{
                 message: MISSING_STUB_SEPARATOR_MESSAGE.WATCHERS,
             }],
-        }, {
-            // eslint-disable-next-line max-len
-            code: "(function IIFE() {\n    'use strict';\n    \n    /////////////////////////////\n    \n    var service = {};\n    \n    /////////////////////////////\n    //                         //\n    //     Public functions    //\n    //                         //\n    /////////////////////////////\n    \n    function toto() { console.log('Toto'); }\n    function titi() { console.log('Titi'); }\n        \n    /////////////////////////////\n    \n        service.toto = toto;\n        service.tata = tata;\n        service.titi = titi;\n})();\n",
+        },
+
+        {
+            code: dedent`
+
+            (function IIFE() {
+                'use strict';
+
+                /////////////////////////////
+
+                function TestFunction() {
+                    var service = {};
+
+                    /////////////////////////////
+                    //                         //
+                    //     Public functions    //
+                    //                         //
+                    /////////////////////////////
+
+                    function toto() {
+                        console.log('Toto');
+                    }
+                    function titi() {
+                        console.log('Titi');
+                    }
+
+                    /////////////////////////////
+
+                    service.toto = toto;
+                    service.tata = tata;
+                    service.titi = titi;
+                }
+            })();
+
+            `,
             errors: [{
                 message: MISSING_STUB_SEPARATOR_MESSAGE.PUBLIC_ATTRIBUTES,
             }],
-            options: [{
-                ignorePrivatePattern: '\\s*(([^ ]+S|s)(ervice|vc)[^ ]*\\s*=\\s*{}|(.+)\\s*=\\s*this);$',
-            }],
-        }, {
-            // eslint-disable-next-line max-len
-            code: "(function IIFE() {\n    'use strict';\n    \n    /////////////////////////////\n    //                         //\n    //    Private attributes   //\n    //                         //\n    /////////////////////////////\n    \n        var toto = 102;\n        \n    /////////////////////////////\n    //                         //\n    //    Private functions    //\n    //                         //\n    /////////////////////////////\n})();\n",
+        },
+
+        {
+            code: dedent`
+
+            (function IIFE() {
+                'use strict';
+
+                /////////////////////////////
+
+                function TestFunction() {
+                    /////////////////////////////
+                    //                         //
+                    //    Private attributes   //
+                    //                         //
+                    /////////////////////////////
+
+                    var toto = 102;
+
+                    /////////////////////////////
+                    //                         //
+                    //    Private functions    //
+                    //                         //
+                    /////////////////////////////
+                }
+            })();
+
+            `,
+
             errors: [{
                 message: PRIVATE_VARIABLE_PREFIXED,
             }],
@@ -175,54 +492,395 @@ ruleTester.run('file-format', rule, {
     ],
 
     valid: [
+        dedent`
+
+        (function IIFE() {
+            'use strict';
+
+            /////////////////////////////
+
+            function TestFunction() {
+                var vm = this;
+                var ctrl = this;
+                var service = {};
+                var svc = {};
+                var serviceTest = {};
+
+                /////////////////////////////
+                //                         //
+                //    Private attributes   //
+                //                         //
+                /////////////////////////////
+
+                var _toto = 101;
+
+                /////////////////////////////
+                //                         //
+                //    Public attributes    //
+                //                         //
+                /////////////////////////////
+
+                vm.titi = 1011;
+                ctrl.titi = 1012;
+                service.titi = 1013;
+                svc.titi = 1014;
+                serviceTest.titi = 1015;
+
+                /////////////////////////////
+                //                         //
+                //    Private functions    //
+                //                         //
+                /////////////////////////////
+
+                function _titi() {
+                    console.log(vm.titi);
+                }
+
+                /////////////////////////////
+                //                         //
+                //     Public functions    //
+                //                         //
+                /////////////////////////////
+
+                function toto() {
+                    console.log(_toto);
+                }
+
+                /////////////////////////////
+
+                vm.toto = toto;
+                ctrl.toto = toto;
+                service.toto = toto;
+                svc.toto = toto;
+                serviceTest.toto = toto;
+
+                /////////////////////////////
+
+                /**
+                 * Initialize the controller.
+                 */
+                function init() {
+                    console.log('Init');
+                }
+
+                init();
+            }
+        })();
+
+        `,
+
+        dedent`
+
+        (function IIFE() {
+            'use strict';
+
+            /////////////////////////////
+
+            function TestFunction() {
+                /////////////////////////////
+                //                         //
+                //    Private attributes   //
+                //                         //
+                /////////////////////////////
+
+                var _toto = 102;
+
+                /////////////////////////////
+                //                         //
+                //    Private functions    //
+                //                         //
+                /////////////////////////////
+            }
+        })();
+
+        `,
+
+        dedent`
+
+        (function IIFE() {
+            'use strict';
+
+            /////////////////////////////
+
+            function TestFunction() {
+                var service = {};
+
+                /////////////////////////////
+                //                         //
+                //     Public functions    //
+                //                         //
+                /////////////////////////////
+
+                function toto() {
+                    console.log('Toto');
+                }
+                function titi() {
+                    console.log('Titi');
+                }
+
+                /////////////////////////////
+
+                service.toto = toto;
+                service.titi = titi;
+            }
+        })();
+
+        `,
+
+        dedent`
+
+        /* eslint-disable lumapps/file-format */
+        'use strict';
+
+        /////////////////////////////
+
+        /////////////////////////////
+        //                         //
+        //    Private attributes   //
+        //                         //
+        /////////////////////////////
+
+        var _toto = 102;
+
+        `,
+
+        dedent`
+
+        (function IIFE() {
+            'use strict';
+
+            /////////////////////////////
+
+            function TestFunction($scope) {
+                /////////////////////////////
+                //                         //
+                //        Watchers         //
+                //                         //
+                /////////////////////////////
+
+                $scope.$watch('toto', function() {
+                    console.log('toto');
+                });
+            }
+        })();
+
+        `,
+
+        dedent`
+
+        (function IIFE() {
+            'use strict';
+
+            /////////////////////////////
+
+            function TestFunction($scope) {
+                /////////////////////////////
+                //                         //
+                //          Events         //
+                //                         //
+                /////////////////////////////
+
+                $scope.$on('toto', function() {
+                    console.log('toto');
+                });
+            }
+        })();
+
+        `,
+
+        dedent`
+
+        // Toto.
+        /* Tata. */
+        /**
+         * Titi.
+         * Toto.
+         */
+
+        (function IIFE() {
+            // This is a comment.
+
+            'use strict';
+
+            /////////////////////////////
+        })();
+
+        `,
+
+        dedent`
+
+        // Toto.
+        /* Tata. */
+        /**
+         * Titi.
+         * Toto.
+         */
+
+        (function IIFE() {
+            // This is a comment.
+
+            'use strict';
+        })();
+
+        `,
+
+        dedent`
+
+        (function IIFE() {
+            'use strict';
+
+            /////////////////////////////
+
+            /* @ngInject */
+            function TestFunction() {
+                var testService2 = {};
+            }
+        })();
+
+        `,
+
         {
-            // eslint-disable-next-line max-len
-            code: "(function IIFE() {\n    'use strict';\n    \n    /////////////////////////////\n    //                         //\n    //    Private attributes   //\n    //                         //\n    /////////////////////////////\n    \n    var _toto = 101;\n    var ctrl = this;\n    var service1 = {};\n    console.log(_toto);\n})();\n",
-            options: [{
-                ignorePrivatePattern: '\\s*(([^ ]+S|s)(ervice|vc)[^ ]*\\s*=\\s*{}|(.+)\\s*=\\s*this);$',
-            }],
-        },
-        // eslint-disable-next-line max-len
-        "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n    //                         //\n    //    Private attributes   //\n    //                         //\n    /////////////////////////////\n\n    var _toto = 102;\n\n    /////////////////////////////\n    //                         //\n    //    Private functions    //\n    //                         //\n    /////////////////////////////\n})();\n",
-        {
-            // eslint-disable-next-line max-len
-            code: "(function IIFE() {\n    'use strict';\n    \n    /////////////////////////////\n    \n    var service = {};\n        \n    /////////////////////////////\n    //                         //\n    //     Public functions    //\n    //                         //\n    /////////////////////////////\n    \n    function toto() { console.log('Toto'); }\n    function titi() { console.log('Titi'); }\n        \n    /////////////////////////////\n\n    service.toto = toto;\n    service.titi = titi;\n})();\n",
-            options: [{
-                ignorePrivatePattern: '\\s*(([^ ]+S|s)(ervice|vc)[^ ]*\\s*=\\s*{}|(.+)\\s*=\\s*this);$',
-            }],
-        },
-        // eslint-disable-next-line max-len
-        "/* eslint-disable lumapps/file-format */\n'use strict';\n\n/////////////////////////////\n\n/////////////////////////////\n\n/////////////////////////////\n//                         //\n//    Private attributes   //\n//                         //\n/////////////////////////////\n\nvar _toto = 102;\n    \n/////////////////////////////\n//                         //\n//    Private functions    //\n//                         //\n/////////////////////////////\n",
-        // eslint-disable-next-line max-len
-        "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n    function toto($scope) {\n        /////////////////////////////\n        //                         //\n        //        Watchers         //\n        //                         //\n        /////////////////////////////\n\n        $scope.$watch('toto', function() { console.log('toto'); });\n    }\n})();\n",
-        // eslint-disable-next-line max-len
-        "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n\n    function toto($scope) {\n        /////////////////////////////\n        //                         //\n        //          Events         //\n        //                         //\n        /////////////////////////////\n\n        $scope.$on('toto', function() { console.log('toto'); });\n    }\n})();\n",
-        // eslint-disable-next-line max-len
-        "// Toto.\n/* Tata. */\n/**\n * Titi.\n * Toto.\n */\n\n(function IIFE() {\n    // This is a comment.\n\n    'use strict';\n\n    /////////////////////////////\n})();\n",
-        // eslint-disable-next-line max-len
-        "// Toto.\n/* Tata. */\n/**\n * Titi.\n * Toto.\n */\n\n(function IIFE() {\n    // This is a comment.\n\n    'use strict';\n})();\n",
-        {
-            // eslint-disable-next-line max-len
-            code: "(function IIFE() {\n    'use strict';\n    \n    /////////////////////////////\n    \n    var testService2 = {};\n        \n    /////////////////////////////\n    //                         //\n    //    Private attributes   //\n    //                         //\n    /////////////////////////////\n    \n    /////////////////////////////\n    //                         //\n    //    Private functions    //\n    //                         //\n    /////////////////////////////\n})();\n",
-            options: [{
-                ignorePrivatePattern: '\\s*(([^ ]+S|s)(ervice|vc)[^ ]*\\s*=\\s*{}|([^ ]+)\\s*=\\s*this);$',
-            }],
-        }, {
-            // eslint-disable-next-line max-len
-            code: "/* eslint-disable lumapps/file-format */\n'use strict';\n\n/////////////////////////////\n\n/////////////////////////////\n\n/////////////////////////////\n//                         //\n//    Private attributes   //\n//                         //\n/////////////////////////////\n\n    var toto = 102;\n    \n/////////////////////////////\n//                         //\n//    Private functions    //\n//                         //\n/////////////////////////////\n",
+            code: dedent`
+
+            /* eslint-disable lumapps/file-format */
+            'use strict';
+
+            /////////////////////////////
+
+            /* @ngInject */
+            function TestFunction() {
+                /////////////////////////////
+                //                         //
+                //    Private attributes   //
+                //                         //
+                /////////////////////////////
+
+                var toto = 102;
+            }
+
+            `,
+
             options: [{
                 ignorePrivateFormat: true,
             }],
         },
-        // eslint-disable-next-line max-len
-        "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n    \n        function init() { console.log('Coucou 3'); }\n})();\n",
-        // eslint-disable-next-line max-len
-        "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n    \n        vm.init = function init() { console.log('Coucou 4'); };\n})();\n",
-        // eslint-disable-next-line max-len
-        "(function IIFE() {\n    'use strict';\n\n    /////////////////////////////\n    \n        this.init = function init() { console.log('Coucou 4'); };\n})();\n",
-        // eslint-disable-next-line max-len
-        "(function IIFE() {\n    'use strict';\n    \n    /////////////////////////////\n    //                         //\n    //     Public functions    //\n    //                         //\n    /////////////////////////////\n    \n        vm.toto = function toto() { console.log('coucou 2'); };\n})();\n",
-        // eslint-disable-next-line max-len
-        "(function IIFE() {\n    'use strict';\n    \n    /////////////////////////////\n    //                         //\n    //     Public functions    //\n    //                         //\n    /////////////////////////////\n    \n        this.toto = function toto() { console.log('coucou 2'); };\n})();\n",
+
+        dedent`
+
+        (function IIFE() {
+            'use strict';
+
+            /////////////////////////////
+
+            /* @ngInject */
+            function TestFunction() {
+                /**
+                 * Initialize the controller.
+                 */
+                function init() {
+                    console.log('Coucou 0');
+                }
+
+                init();
+            }
+        })();
+
+        `,
+
+        dedent`
+
+        (function IIFE() {
+            'use strict';
+
+            /////////////////////////////
+
+            /* @ngInject */
+            function TestFunction() {
+                var vm = this;
+
+                /////////////////////////////
+
+                /**
+                 * Initialize the controller.
+                 */
+                vm.init = function init() {
+                    console.log('Coucou 1');
+                };
+
+                vm.init();
+            }
+        })();
+
+        `,
+
+        dedent`
+
+        (function IIFE() {
+            'use strict';
+
+            /////////////////////////////
+
+            /* @ngInject */
+            function TestFunction() {
+                /**
+                 * Initialize the controller.
+                 */
+                this.init = function init() {
+                    console.log('Coucou 2');
+                };
+
+                this.init();
+            }
+        })();
+
+        `,
+
+        dedent`
+
+        (function IIFE() {
+            'use strict';
+
+            /////////////////////////////
+
+            /* @ngInject */
+            function TestFunction() {
+                var vm = this;
+
+                /////////////////////////////
+                //                         //
+                //     Public functions    //
+                //                         //
+                /////////////////////////////
+
+                vm.toto = function toto() {
+                    console.log('Coucou 3');
+                };
+            }
+        })();
+
+        `,
+
+        dedent`
+
+        (function IIFE() {
+            'use strict';
+
+            /////////////////////////////
+
+            /* @ngInject */
+            function TestFunction() {
+                /////////////////////////////
+                //                         //
+                //     Public functions    //
+                //                         //
+                /////////////////////////////
+
+                this.toto = function toto() {
+                    console.log('Coucou 4');
+                };
+            }
+        })();
+
+        `,
     ],
 });

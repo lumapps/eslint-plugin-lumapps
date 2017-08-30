@@ -24,6 +24,7 @@
     "eslint": ">= 3.19.0"
   },
   "devDependencies": {
+    "dedent-js": "^1.0.1",
     "eslint": "latest",
     "mocha": "^2.4.5"
   },
