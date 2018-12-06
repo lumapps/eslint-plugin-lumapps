@@ -37,7 +37,7 @@ module.exports = {
         // Helpers
         //----------------------------------------------------------------------
 
-        const astUtils = require('eslint/lib/ast-utils');
+        const astUtils = require('eslint/lib/util/ast-utils');
 
         /**
          * Report an error with a ternary.

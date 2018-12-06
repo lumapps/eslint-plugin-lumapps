@@ -21,12 +21,12 @@
     "test:single": "mocha"
   },
   "peerDependencies": {
-    "eslint": "^4.19.1"
+    "eslint": "latest"
   },
   "devDependencies": {
-    "dedent-js": "^1.0.1",
+    "dedent-js": "latest",
     "eslint": "latest",
-    "mocha": "^2.4.5"
+    "mocha": "latest"
   },
   "license": "MIT",
   "private": true
