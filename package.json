@@ -21,7 +21,7 @@
     "test:single": "mocha"
   },
   "peerDependencies": {
-    "eslint": ">= 3.19.0"
+    "eslint": "^4.19.1"
   },
   "devDependencies": {
     "dedent-js": "^1.0.1",
