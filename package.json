@@ -17,13 +17,18 @@
   },
   "main": "index.js",
   "scripts": {
-    "test": "mocha ./tests/*.js",
-    "test:single": "mocha"
+    "test": "mocha --compilers js:@babel/register ./tests/*.js",
+    "test:single": "mocha --compilers js:@babel/register"
   },
   "peerDependencies": {
     "eslint": "latest"
   },
   "devDependencies": {
+    "@babel/cli": "^7.2.3",
+    "@babel/core": "^7.2.2",
+    "@babel/node": "^7.2.2",
+    "@babel/preset-env": "^7.3.1",
+    "@babel/register": "^7.0.0",
     "dedent-js": "latest",
     "eslint": "latest",
     "mocha": "latest"

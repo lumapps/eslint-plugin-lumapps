@@ -14,25 +14,12 @@
 
 const COMMENTS_REGEXP = /^\s*(([/]{2,}\s*.*)|([/]+[*]+\s*.*\s*[*]+[/]+)|([/][*]+)|([*]+\s*[^/]*)|[*]+[/])\s*$/;
 
-const FIRST_LINE = `(function IIFE() {`;
-const FIRST_LINE_REGEXP = /^\s*\(function IIFE\(\) \{\s*$/;
-const FIRST_LINE_MESSAGE = `First line of the file must be the IIFE function.`;
-
 const EMPTY_LINE_MESSAGE = `The file must end with an empty line.`;
-
-const LAST_LINE = `})();`;
-const LAST_LINE_REGEXP = /^\s*\}\)\(\);\s*$/;
-const LAST_LINE_MESSAGE = `Last line (before the empty one) must be the call of the IIFE.`;
-
-const USE_STRICT = `'use strict';`;
-const USE_STRICT_REGEXP = /^\s*'use strict';\s*$/;
-const MISSING_STRICT_MESSAGE = `Expected "${USE_STRICT}" to be the first statement of the IIFE.`;
 
 const SEPARATOR = `/////////////////////////////`;
 const EMPTY_SEPARATOR = `//                         //`;
 const SEPARATOR_REGEXP = /^\s*\/{29}\s*$/;
 const EMPTY_SEPARATOR_REGEXP = /^\s*\/\/\s{25}\/\/\s*$/;
-const MISSING_SEPARATOR_MESSAGE = `Expected a separator after the "${USE_STRICT}" statement.`;
 
 const SEPARATORS = {
     EVENTS: /^\s*\/\/          Events         \/\/\s*$/,
@@ -75,9 +62,6 @@ const SCHEMA_BODY = {
         ignoreEmptyLastLine: {
             type: 'boolean',
         },
-        ignoreIIFE: {
-            type: 'boolean',
-        },
         ignorePrivateFormat: {
             type: 'boolean',
         },
@@ -87,20 +71,15 @@ const SCHEMA_BODY = {
         ignoreStubSeparators: {
             type: 'boolean',
         },
-        ignoreUseStrict: {
-            type: 'boolean',
-        },
     },
     type: 'object',
 };
 
 const DEFAULTS = {
     ignoreEmptyLastLine: false,
-    ignoreIIFE: false,
     ignorePrivateFormat: false,
     ignorePrivatePattern: '\\s*(([^ ]+S|s)(ervice|vc)[^ ]*\\s*=\\s*{}|([^ ]+)\\s*=\\s*([{][}];|this;|.+Service.+))$',
     ignoreStubSeparators: false,
-    ignoreUseStrict: false,
 };
 
 /**
@@ -159,49 +138,8 @@ module.exports = {
             parserOptions.sourceType = parserOptions.sourceType || 'script';
             parserOptions.ecmaVersion = parserOptions.ecmaVersion || 5;
 
-            if (parserOptions.sourceType === 'script' && !normalizedOptions.ignoreIIFE &&
-                !FIRST_LINE_REGEXP.test(firstLine)) {
-                context.report({
-                    data: `Expected "${FIRST_LINE}"`,
-                    loc: {
-                        end: {
-                            column: firstLine.length,
-                            line: 1,
-                        },
-                        start: {
-                            column: 0,
-                            line: 1,
-                        },
-                    },
-                    message: FIRST_LINE_MESSAGE,
-
-                    node: null,
-                });
-            }
-
             let lastLine = lines[lines.length - 1];
-            if (lastLine.length === 0) {
-                let lastTextLine = lines[lines.length - 2];
-                if (parserOptions.sourceType === 'script' && !normalizedOptions.ignoreIIFE &&
-                    !LAST_LINE_REGEXP.test(lastTextLine)) {
-                    context.report({
-                        data: `Expected "${LAST_LINE}"`,
-                        loc: {
-                            end: {
-                                column: lastTextLine.length,
-                                line: lines.length - 1,
-                            },
-                            start: {
-                                column: 0,
-                                line: lines.length - 1,
-                            },
-                        },
-                        message: LAST_LINE_MESSAGE,
-
-                        node: null,
-                    });
-                }
-            } else if (!normalizedOptions.ignoreEmptyLastLine) {
+            if (lastLine.length > 0 && !normalizedOptions.ignoreEmptyLastLine) {
                 context.report({
                     data: `Expected an empty line`,
                     loc: {
@@ -223,78 +161,6 @@ module.exports = {
             let line;
             let len = lines.length;
             let error = false;
-            if (parserOptions.sourceType === 'script' && !normalizedOptions.ignoreUseStrict) {
-                let i = lineIndex;
-                for (i = (lineIndex + 1); i < len; i++) {
-                    line = lines[i];
-                    if ((COMMENTS_REGEXP.test(line) || line === undefined || line.length === 0)) {
-                        continue;
-                    }
-
-                    if (!USE_STRICT_REGEXP.test(line)) {
-                        context.report({
-                            data: `Expected "${USE_STRICT}"`,
-                            loc: {
-                                end: {
-                                    column: line.length,
-                                    line: i + 1,
-                                },
-                                start: {
-                                    column: 0,
-                                    line: i + 1,
-                                },
-                            },
-                            message: MISSING_STRICT_MESSAGE,
-
-                            node: null,
-                        });
-
-                        return;
-                    }
-
-                    break;
-                }
-
-                i++;
-
-                let j = 0;
-                for (j = 0; j < 2; j++) {
-                    line = lines[i];
-
-                    if (LAST_LINE_REGEXP.test(line) || i === (len - 1)) {
-                        break;
-                    }
-
-                    if (j === 0 && line.trim().length !== 0) {
-                        error = true;
-                        break;
-                    } else if (j === 1 && !SEPARATOR_REGEXP.test(line)) {
-                        error = true;
-                        break;
-                    }
-
-                    i++;
-                }
-
-                if (error) {
-                    context.report({
-                        data: `Expected "${SEPARATOR}"`,
-                        loc: {
-                            end: {
-                                column: line.length,
-                                line: i + 1,
-                            },
-                            start: {
-                                column: 0,
-                                line: i + 1,
-                            },
-                        },
-                        message: MISSING_SEPARATOR_MESSAGE,
-
-                        node: null,
-                    });
-                }
-            }
 
             let seen = {
                 EVENTS: false,
@@ -313,12 +179,12 @@ module.exports = {
                 WATCHERS: true,
             };
             const regexp = {
-                EVENTS: /^\s{8}\$(rootScope|scope)\.\$on\(/,
-                PRIVATE_ATTRIBUTES: /^\s{8}(var|let) _[a-z][^ ;]*( = [^;]+)?;?$/,
-                PRIVATE_FUNCTIONS: /^\s{8}function _[a-z][^(]*\([^)]*\)\s*{?/,
-                PUBLIC_ATTRIBUTES: /^\s{8}[a-z][^. ]*\.[a-z][^ ]* = [^;]+;?$/,
-                PUBLIC_FUNCTIONS: /^\s{8}([a-z][^. ]*\.[a-z][^ ]* = )?function [a-z][^(]*\([^)]*\)\s*{?/,
-                WATCHERS: /^\s{8}\$(rootScope|scope)\.\$watch(Collection)?\(/,
+                EVENTS: /^\s{4}\$(rootScope|scope)\.\$on\(/,
+                PRIVATE_ATTRIBUTES: /^\s{4}(var|let|const) _[a-z][^ ;]*( = [^;]+)?;?$/,
+                PRIVATE_FUNCTIONS: /^\s{4}function _[a-z][^(]*\([^)]*\)\s*{?/,
+                PUBLIC_ATTRIBUTES: /^\s{4}[a-z][^. ]*\.[a-z][^ ]* = [^;]+;?$/,
+                PUBLIC_FUNCTIONS: /^\s{4}([a-z][^. ]*\.[a-z][^ ]* = )?function [a-z][^(]*\([^)]*\)\s*{?/,
+                WATCHERS: /^\s{4}\$(rootScope|scope)\.\$watch(Collection)?\(/,
             };
 
             const publicFunctions = [];
@@ -348,7 +214,7 @@ module.exports = {
                                             line: k + 3,
                                         },
                                         start: {
-                                            column: 8,
+                                            column: 4,
                                             line: k - 1,
                                         },
                                     },
@@ -425,7 +291,7 @@ module.exports = {
                                                 line: k + 2,
                                             },
                                             start: {
-                                                column: 8,
+                                                column: 4,
                                                 line: k + 1,
                                             },
                                         },
@@ -440,7 +306,7 @@ module.exports = {
                 }
 
                 if (!normalizedOptions.ignorePrivateFormat) {
-                    if ((/^\s{8}(var|let) [a-z][^ ]* = /).test(line) &&
+                    if ((/^\s{4}(var|let|const) [a-z][^ ]* = /).test(line) &&
                         (normalizedOptions.ignorePrivatePattern === undefined ||
                         normalizedOptions.ignorePrivatePattern === null ||
                         !RegExp(normalizedOptions.ignorePrivatePattern).test(line))) {
@@ -452,7 +318,7 @@ module.exports = {
                                     line: k + 1,
                                 },
                                 start: {
-                                    column: (line.indexOf('var') || line.indexOf('let')) + 4,
+                                    column: (line.indexOf('var') || line.indexOf('let') || line.indexOf('const')),
                                     line: k + 1,
                                 },
                             },
