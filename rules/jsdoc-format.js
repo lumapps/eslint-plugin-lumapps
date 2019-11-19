@@ -8,7 +8,7 @@
 // Requirements
 //------------------------------------------------------------------------------
 
-const FIRST_LETTER_PATTERN = require('eslint/lib/util/patterns/letters');
+const FIRST_LETTER_PATTERN = require('eslint/lib/rules/utils/patterns/letters');
 
 //------------------------------------------------------------------------------
 // Helpers
