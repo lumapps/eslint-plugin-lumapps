@@ -21,17 +21,17 @@
     "test:single": "mocha --compilers js:@babel/register"
   },
   "peerDependencies": {
-    "eslint": "latest"
+    "eslint": "^6.7.1"
   },
   "devDependencies": {
-    "@babel/cli": "latest",
-    "@babel/core": "latest",
-    "@babel/node": "latest",
-    "@babel/preset-env": "latest",
-    "@babel/register": "latest",
-    "dedent-js": "latest",
-    "eslint": "latest",
-    "mocha": "latest"
+    "@babel/cli": "^7.7.4",
+    "@babel/core": "^7.7.4",
+    "@babel/node": "^7.7.4",
+    "@babel/preset-env": "^7.7.4",
+    "@babel/register": "^7.7.4",
+    "dedent-js": "^1.0.1",
+    "eslint": "^6.7.1",
+    "mocha": "^6.2.2"
   },
   "license": "MIT",
   "private": true
